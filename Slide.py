@@ -9,6 +9,7 @@ class Slide(object):
             assert photos[0].orientation == photos[1].orientation == "V", "Both photos should be V"
             self.keywords = photos[0].keywords | photos[1].keywords
             self.id = str(photos[0].id) + " " + str(photos[1].id)
+            self.photos = list(photos[0], photos[1])
         if len(photos) == 1:
             assert photos[0].orientation == "H", "Photo should be H"
             self.keywords = photos[0].keywords
@@ -19,3 +20,13 @@ class Slide(object):
 
     def score(self, photo):
         min(self.overlapp(photo))
+
+    def switch_photos_A(self, slide):
+        tmp = self.photos[0]
+        self.photos[0] = slide.photos[0]
+        slide.photos[0] = tmp
+
+    def switch_photos_B(self, slide):
+        tmp = self.photos[0]
+        self.photos[0] = slide.photos[1]
+        slide.photos[1] = tmp
