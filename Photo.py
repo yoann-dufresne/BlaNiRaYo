@@ -6,5 +6,8 @@ class Photo():
         self.orientation = orientation
         self.keywords = set(keywords)
 
-        
-        
+    def overlapp(self, photo):
+        return len(tags1 & tags2), len(tags1 - tags2), len(tags2 - tags1)
+
+    def score(self, photo):
+        min(self.overlapp(photo))
