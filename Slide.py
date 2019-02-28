@@ -19,7 +19,7 @@ class Slide(object):
         return len(self.keywords & photo.keywords), len(self.keywords - photo.keywords), len(photo.keywords - self.keywords)
 
     def score(self, photo):
-        min(self.overlapp(photo))
+        return min(self.overlapp(photo))
 
     def switch_photos_A(self, slide):
         tmp = self.photos[0]
@@ -30,3 +30,4 @@ class Slide(object):
         tmp = self.photos[0]
         self.photos[0] = slide.photos[1]
         slide.photos[1] = tmp
+

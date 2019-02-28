@@ -14,7 +14,9 @@ class Solution():
         return score
 
     def save(self):
-        outfile = open(f"data/{sys.argv[1]}_{self.score()}.txt","w")
+        outfile_name = f"data/{sys.argv[1]}_{self.score()}.txt"
+        print(f"saving {outfile_name}")
+        outfile = open(outfile_name, "w")
         outfile.write(str(len(self.slides))+"\n")
         for slide in self.slides:
             outfile.write(f"{slide.id}\n")
