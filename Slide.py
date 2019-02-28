@@ -8,7 +8,7 @@ class Slide(object):
         if len(photos) == 2:
             assert photos[0].orientation == photos[1].orientation == "V", "Both photos should be V"
             self.keywords = photos[0].keywords | photos[1].keywords
-            self.id = photos[0].id + " " + photos[1].id
+            self.id = str(photos[0].id) + " " + str(photos[1].id)
         if len(photos) == 1:
             assert photos[0].orientation == "H", "Photo should be H"
             self.keywords = photos[0].keywords
