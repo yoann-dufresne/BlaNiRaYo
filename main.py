@@ -5,7 +5,7 @@ import sys
 
 def main():
     for line in sys.stdin:
-        print(line)
+        print(line, end="")
 
 
 if __name__ == "__main__":
