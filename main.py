@@ -19,7 +19,6 @@ def main():
     assert(counter == len(photos) and counter == nb_photos)
 
     print(len(photos),"photos parsed")
-    print(photos)
 
 if __name__ == "__main__":
     main()
