@@ -7,7 +7,7 @@ class Photo():
         self.keywords = set(keywords)
 
     def overlapp(self, photo):
-        return len(tags1 & tags2), len(tags1 - tags2), len(tags2 - tags1)
+        return len(self.keywords & photo.keywords), len(self.keywords - photo.keywords), len(photo.keywords - self.keywords)
 
     def score(self, photo):
         min(self.overlapp(photo))
