@@ -41,7 +41,7 @@ def main():
     global photos
     global keywords
     counter = 0
-    for line in sys.stdin:
+    for line in open(sys.argv[1]):
         if len(line.split()) == 1:
             nb_photos = int(line.strip())
         else:

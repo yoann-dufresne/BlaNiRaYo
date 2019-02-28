@@ -1,4 +1,4 @@
-
+import sys
 
 class Solution():
     """docstring for Solution"""
@@ -14,7 +14,7 @@ class Solution():
         return score
 
     def save(self):
-        outfile = open(f"data/sol_{self.score()}.txt","w")
+        outfile = open(f"data/{sys.argv[1]}_{self.score()}.txt","w")
         outfile.write(str(len(self.slides))+"\n")
         for slide in self.slides:
             outfile.write(f"{slide.id}\n")
