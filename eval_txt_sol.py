@@ -30,6 +30,7 @@ def compute_score(p1, p2):
     return min(len(tags1 & tags2), len(tags1 - tags2), len(tags2 - tags1))
 
 
+# arguments: [dataset] [solution]
 
 def main():
     global photos
@@ -52,12 +53,18 @@ def main():
     print(len(photos),"photos parsed")
     #print(photos)
 
-    solution_file = "sol.txt"
+    solution_file = sys.argv[2]
     sl = open(solution_file).readlines()
     sl = sl[1:]
     sol = Solution()
-    sol.slides = list(map(int,sl))
-    sol.slides = list(map(lambda x:Slide(photos[x]),sol.slides))
+    for line in sl:
+        if len(line.strip().split()) == 1:
+            x = int(line.strip())
+            sol.slides += [Slide(photos[x])]
+        else:
+            assert(len(line.strip().split()) == 2)
+            x,y = map(int,line.strip().split())
+            sol.slides += [Slide(photos[x],photos[y])]
     print("evaluating",len(sol.slides),"slides")
     print("score:",sol.score())
 
