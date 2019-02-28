@@ -3,6 +3,7 @@
 import sys
 from Photo import Photo
 from Slide import Slide
+from Solution import Solution
 
 def split_photos(photos):
     """Return two lists of photos: H, V"""
@@ -30,6 +31,11 @@ def compute_score(p1, p2):
 
 
 
+def random(photos):
+    sol = Solution()
+    sol.slides = photos
+    return sol
+
 
 def main():
     global photos
@@ -52,10 +58,15 @@ def main():
     print(len(photos),"photos parsed")
     #print(photos)
 
+<<<<<<< Updated upstream
     (H, V) = split_photos(photos)
     H_slides = list(map(Slide, H))
 
 
+=======
+    sol = random([p for p in photos if p.orientation == "H"])
+    sol.save()
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()
