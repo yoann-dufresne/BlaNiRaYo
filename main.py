@@ -60,6 +60,8 @@ def main():
 
     (H, V) = split_photos(photos)
     H_slides = list(map(Slide, H))
+    nb_V = len(V)
+    V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
 
     sol = random([p for p in photos if p.orientation == "H"])
     sol.save()
