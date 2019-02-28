@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+from random import shuffle
 from Photo import Photo
 from Slide import Slide
 from Solution import Solution
@@ -45,6 +46,28 @@ def sol_blaise_1(photos):
     sol.slides = V_slides + H_slides
     return sol
 
+def sol_blaise_2(photos):
+    (H, V) = split_photos(photos)
+    max_score = 0
+    best_sol = None
+    for _ in range(100):
+        shuffle(H)
+        shuffle(V)
+        H_slides = list(map(Slide, H))
+        nb_V = len(V)
+        V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
+        sol = Solution()
+        sol.slides = V_slides + H_slides
+        if best_sol is None:
+            best_sol = sol
+            max_score = sol.score()
+        else:
+            if sol.score() > max_score:
+                best_sol = sol
+                max_score = sol.score()
+    return best_sol
+
+
 def main():
     global photos
     global keywords
@@ -66,11 +89,14 @@ def main():
     print(len(photos),"photos parsed")
     #print(photos)
 
-    sol = random([p for p in photos if p.orientation == "H"])
-    sol.save()
+    #sol = random([p for p in photos if p.orientation == "H"])
+    #sol.save()
 
-    sol = sol_blaise_1(photos)
+    sol = sol_blaise_2(photos)
     sol.save()
+    #for _ in range(100):
+    #    shuffle(sol.slides)
+    #    sol.save()
 
 if __name__ == "__main__":
     main()
