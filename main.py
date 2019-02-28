@@ -3,10 +3,20 @@
 import sys
 
 
-def main():
-    for line in sys.stdin:
-        print(line, end="")
+# structure de cette liste:
+# (id, orientation, tag0, tag1, tag2, ..)
+photos = []
 
+def main():
+    global photos
+    counter = 0
+    for line in sys.stdin:
+        if len(line.split()) == 1:
+            nb_photos = int(line.strip())
+        else:
+            photos += [(counter, *line.strip().split()[0], *line.strip().split()[2:])]
+
+    print(len(photos),"photos parsed")
 
 if __name__ == "__main__":
     main()
