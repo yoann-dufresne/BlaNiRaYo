@@ -7,12 +7,12 @@ class Slide(object):
             raise ValueError("Wrong number of photos")
         if len(photos) == 2:
             assert photos[0].orientation == photos[1].orientation == "V", "Both photos should be V"
-            self.keywords = photo[0].keywords | photos[1].keywords
-            self.id = photo[0].id + " " + photo[1].id
+            self.keywords = photos[0].keywords | photos[1].keywords
+            self.id = photos[0].id + " " + photos[1].id
         if len(photos) == 1:
             assert photos[0].orientation == "H", "Photo should be H"
             self.keywords = photos[0].keywords
-            self.id = photo[0].id
+            self.id = photos[0].id
 
     def overlapp(self, photo):
         return len(self.keywords & photo.keywords), len(self.keywords - photo.keywords), len(photo.keywords - self.keywords)
