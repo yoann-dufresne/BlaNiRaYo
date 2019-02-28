@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-
+from Photo import Photo
 
 # structure de cette liste:
 # (id, orientation, tag0, tag1, tag2, ..)
@@ -16,8 +16,8 @@ def main():
         if len(line.split()) == 1:
             nb_photos = int(line.strip())
         else:
-            photos += [(counter, *line.strip().split()[0], line.strip().split()[2:])]
-            for kw in photos[-1][2]:
+            photos += [Photo(counter, *line.strip().split()[0], line.strip().split()[2:])]
+            for kw in photos[-1].keywords:
                 if not kw in keywords:
                     keywords[kw] = []
                 keywords[kw].append(photos[-1])
