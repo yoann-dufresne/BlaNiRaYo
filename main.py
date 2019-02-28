@@ -2,6 +2,19 @@
 
 import sys
 from Photo import Photo
+from Slide import Slide
+
+def split_photos(photos):
+    """Return two lists of photos: H, V"""
+    H = []
+    V = []
+    for photo in photos:
+        if photo.orientation == "H":
+            H.append(photo)
+        elif photo.orientation == "V":
+            V.append(photo)
+    return (H, V)
+    
 
 # structure de cette liste:
 # (id, orientation, tag0, tag1, tag2, ..)
@@ -38,6 +51,11 @@ def main():
 
     print(len(photos),"photos parsed")
     #print(photos)
+
+    (H, V) = split_photos(photos)
+    H_slides = list(map(Slide, H))
+
+
 
 if __name__ == "__main__":
     main()
