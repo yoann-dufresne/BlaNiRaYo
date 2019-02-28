@@ -61,7 +61,6 @@ def main():
     (H, V) = split_photos(photos)
     H_slides = list(map(Slide, H))
 
-
     sol = random([p for p in photos if p.orientation == "H"])
     sol.save()
 
