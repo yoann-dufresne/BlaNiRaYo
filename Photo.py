@@ -11,3 +11,6 @@ class Photo():
 
     def score(self, photo):
         return min(self.overlapp(photo))
+
+    def __repr__(self):
+        return str(self.id)

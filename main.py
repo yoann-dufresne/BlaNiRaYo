@@ -5,6 +5,7 @@ from random import shuffle
 from Photo import Photo
 from Slide import Slide
 from Solution import Solution
+from HillClimbing import HillClimbing as HC
 
 def split_photos(photos):
     """Return two lists of photos: H, V"""
@@ -91,12 +92,22 @@ def main():
 
     #sol = random([p for p in photos if p.orientation == "H"])
     #sol.save()
+    (H, V) = split_photos(photos)
+    H_slides = list(map(Slide, H))
+    nb_V = len(V)
+    V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
+    sol = Solution()
+    sol.slides = V_slides + H_slides
 
-    sol = sol_blaise_2(photos)
-    sol.save()
+    # sol = sol_blaise_2(photos)
+    # sol.save()
     #for _ in range(100):
     #    shuffle(sol.slides)
     #    sol.save()
+
+    hc = HC(sol)
+    hc.climb()
+
 
 if __name__ == "__main__":
     main()

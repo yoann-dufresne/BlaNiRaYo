@@ -40,3 +40,6 @@ class Slide(object):
         slide.photos = (slide.photos[0], tmp)
         slide.keywords = slide.photos[0].keywords | tmp.keywords
         slide.id = str(slide.photos[0].id) + " " + str(tmp.id)
+
+    def __repr__(self):
+        return str(self.id)
