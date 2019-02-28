@@ -8,6 +8,16 @@ import sys
 photos = []
 keywords = {}
 
+def compute_score(p1, p2):
+    tags1 = set(p1[2])
+    tags2 = set(p2[2])
+    print(tags1)
+    print(tags2)
+    return min(len(tags1 & tags2), len(tags1 - tags2), len(tags2 - tags1))
+
+
+
+
 def main():
     global photos
     global keywords
