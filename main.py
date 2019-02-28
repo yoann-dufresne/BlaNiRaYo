@@ -58,15 +58,12 @@ def main():
     print(len(photos),"photos parsed")
     #print(photos)
 
-<<<<<<< Updated upstream
     (H, V) = split_photos(photos)
     H_slides = list(map(Slide, H))
 
 
-=======
     sol = random([p for p in photos if p.orientation == "H"])
     sol.save()
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()
