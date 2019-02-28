@@ -97,7 +97,10 @@ def main():
     nb_V = len(V)
     V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
     sol = Solution()
-    sol.slides = V_slides + H_slides
+    if len(sys.argv) > 2:
+        sol = Solution(photos=photos, file=sys.argv[2])
+    if len(sol.slides) == 0:
+        sol.slides = V_slides + H_slides
 
     # sol = sol_blaise_2(photos)
     # sol.save()
