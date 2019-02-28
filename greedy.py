@@ -100,14 +100,15 @@ def find_best_pair(current):
     for j in remaining:
         tags_candidate = set(photos[j].keywords)
         score = compute_score_tags(tags_current,tags_candidate)
-        candidates += [(score,j)]
-        if explored > 1000: break # heuristic
+        if score > 0:
+            candidates += [(score,j)]
+        if explored > 3000: break # heuristic
         explored += 1
     if len(candidates) == 0:
         candidates = [(0,list(remaining)[0])] # hack
     selected = max(candidates)[1]
     remaining -= set([selected])
-    print("max",max(candidates))
+    #print("max",max(candidates))
     return selected
 
 def find_next_start(tags_list):
@@ -118,13 +119,13 @@ def find_next_start(tags_list):
         tags_candidate = set(photos[j].keywords)
         score = compute_score_tags(tags_list,tags_candidate)
         candidates += [(score,j)]
-        if explored > 1000: break # heuristic
+        if explored > 3000: break # heuristic
         explored += 1
     if len(candidates) == 0:
         candidates = [(0,list(remaining)[0])] # hack
     selected = max(candidates)[1]
     remaining -= set([selected])
-    print("max",max(candidates))
+    #print("max",max(candidates))
     return selected
 
 
