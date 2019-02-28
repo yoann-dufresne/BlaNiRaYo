@@ -15,8 +15,11 @@ def main():
             nb_photos = int(line.strip())
         else:
             photos += [(counter, *line.strip().split()[0], *line.strip().split()[2:])]
+            counter += 1
+    assert(counter == len(photos) and counter == nb_photos)
 
     print(len(photos),"photos parsed")
+    print(photos)
 
 if __name__ == "__main__":
     main()
