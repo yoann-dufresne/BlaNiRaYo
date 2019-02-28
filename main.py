@@ -36,6 +36,14 @@ def random(photos):
     sol.slides = photos
     return sol
 
+def sol_blaise_1(photos):
+    (H, V) = split_photos(photos)
+    H_slides = list(map(Slide, H))
+    nb_V = len(V)
+    V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
+    sol = Solution()
+    sol.slides = V_slides + H_slides
+    return sol
 
 def main():
     global photos
@@ -58,12 +66,10 @@ def main():
     print(len(photos),"photos parsed")
     #print(photos)
 
-    (H, V) = split_photos(photos)
-    H_slides = list(map(Slide, H))
-    nb_V = len(V)
-    V_slides = [Slide(p1, p2) for (p1, p2) in zip(V[:nb_V//2], V[nb_V//2:])]
-
     sol = random([p for p in photos if p.orientation == "H"])
+    sol.save()
+
+    sol = sol_blaise_1(photos)
     sol.save()
 
 if __name__ == "__main__":

@@ -18,4 +18,4 @@ class Slide(object):
         return len(self.keywords & photo.keywords), len(self.keywords - photo.keywords), len(photo.keywords - self.keywords)
 
     def score(self, photo):
-        min(self.overlapp(photo))
+        return min(self.overlapp(photo))
