@@ -22,7 +22,7 @@ class HillClimbing():
         sequences = []
         current = []
 
-        threshold = random.rand(5)
+        threshold = random.randint(0, 5)
 
         for slide in self.sol.slides:
             if len(current) == 0:
