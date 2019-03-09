@@ -22,7 +22,6 @@ def split_photos(photos):
 photos = []
 keywords = {}
 
-
 # arguments: [dataset] [solution]
 
 def main():
@@ -49,18 +48,39 @@ def main():
     solution_file = sys.argv[2]
     sl = open(solution_file).readlines()
     sl = sl[1:]
-    sol = Solution()
-    for line in sl:
-        if len(line.strip().split()) == 1:
-            x = int(line.strip())
-            sol.slides += [Slide(photos[x])]
-        else:
-            assert(len(line.strip().split()) == 2)
-            x,y = map(int,line.strip().split())
-            sol.slides += [Slide(photos[x],photos[y])]
-    print("evaluating",len(sol.slides),"slides")
-    print("score:",sol.score())
+    possibilities = []
 
+    # record all the verticals
+    verticals_left = []
+    verticals_right = []
+    for line in sl:
+        if len(line.strip().split()) != 1:
+            x,y = map(int,line.strip().split())
+            verticals_left += [x]
+            verticals_right += [y]
+    all_verticals = verticals_left + verticals_right
+
+    for shift in range(len(verticals_right)):
+        # construct a solution with that shift
+        sol = Solution()
+        for i, line in enumerate(sl):
+            if len(line.strip().split()) == 1:
+                x = int(line.strip())
+                sol.slides += [Slide(photos[x])]
+            else: # vertical
+                assert(len(line.strip().split()) == 2)
+                x,y = map(int,line.strip().split())
+                y = verticals_right[(i+shift) % len(verticals_right)] # substitute with shifted
+                #x = all_verticals[(i+shift) % len(all_verticals)]
+                #y = all_verticals[(i++len(verticals_left)+shift) % len(all_verticals)]
+                sol.slides += [Slide(photos[x],photos[y])]
+     
+        print("evaluating",len(sol.slides),"slides")
+        score = sol.score()
+        print("score:",score)
+        possibilities += [(score,sol)]
+
+    print("best score",max(possibilities)[0])
 
 if __name__ == "__main__":
     main()
