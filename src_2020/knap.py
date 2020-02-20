@@ -34,7 +34,7 @@ m.optimize()
 selected = [i for i in I if x[i].x >= 0.99]
 print(len(selected),'selected items out of ',nb_lib)#': {}'.format(selected))
 
-sol_filename = "../res_2020/" +  prefix + "_sol.txt" 
+sol_filename = "res_2020/" +  prefix + "_sol.txt" 
 
 
 #score = scorer(sys.argv[1],"../res_2020/" + sol_filename)
@@ -52,4 +52,4 @@ while len(lib_set) > 0:
     max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first, forbidden)]
     forbidden |= set(max_lib.books_to_scan)
 
-output("res_2020/sol.txt", libs)
+output(sol_filename, libs)
