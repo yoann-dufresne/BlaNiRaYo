@@ -39,13 +39,25 @@ sol_filename = "res_2020/" +  prefix + "_sol.txt"
 libs = [libs[i] for i in selected]
 
 forbidden = set()
-lib_set = set(libs)
 libs_sol = []
-while len(lib_set) > 0:
-    print(len(lib_set))
-    max_lib = max(lib_set, key=lambda x: x.interest1(nb_days, avoid=forbidden))
+import heapq
+lib_q = [(0,x) for x in libs]
+def update_lib_queue():
+    global lib_q
+    remaining_libs = [lib for x,lib in lib_q]
+    lib_q = []
+    for lib in remaining_libs:
+        heapq.heappush(lib_q, (lib.interest1(nb_days, avoid=forbidden), lib))
+iteration = 0
+update_lib_queue()
+while len(lib_q) > 0:
+    if nb_lib < 10000 or iteration % 50 == 1:
+        update_lib_queue()
+    iteration += 1
+    print(len(lib_q))
+    value, max_lib = heapq.heappop(lib_q)
+    #print(value,max_lib.worthy_books_first)
     libs_sol.append(max_lib)
-    lib_set.remove(max_lib)
     # Selection livres
     max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first(nb_days), forbidden)]
     forbidden |= set(max_lib.books_to_scan)
