@@ -26,9 +26,6 @@ class Library:
     def add_books(self, books):
         self.books.append(books)
 
-    def sort_books(self):
-        pass
-
     @property
     def worthy_books_first(self):
         return sorted(self.books, key=attrgetter("score"), reverse=True)
