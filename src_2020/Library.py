@@ -17,7 +17,7 @@ class Library:
         self.books = []
 
     def add_books(self, books):
-        self.books = books
+        self.books.append(books)
 
     def sort_books(self):
         pass
