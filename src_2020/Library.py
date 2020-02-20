@@ -6,6 +6,11 @@ class Book:
     def __init__(self, ide, score):
         self.ide = ide
         self.score = score
+        self.frq = 0
+
+    @property
+    def weighted_score(self):
+        return self.score / self.frq
 
 
 def mask_books(books, avoid):
@@ -38,7 +43,7 @@ class Library:
         self.books_to_scan.extend(books)
 
     def worthy_books_first(self, time_available):
-        return sorted(self.books, key=attrgetter("score"), reverse=True)[:time_available*self.ship]
+        return sorted(self.books, key=attrgetter("weighted_score"), reverse=True)[:time_available*self.ship]
 
     def nb_books_scannable(self, time_avail):
         time_bookflow = time_avail - self.signup
@@ -52,9 +57,5 @@ class Library:
 
         return sum(b.score for b in mask_books(self.worthy_books_first(time_avail-self.signup)[:nb_books_scannable], avoid))
 
-    def interest2(self, time_avail, avoid=set()):
-        nb_books_scannable = self.nb_books_scannable(time_avail-self.signup)
-
-        return sum(b.score for b in mask_books(self.worthy_books_first(time_avail-self.signup)[:nb_books_scannable], avoid))
 
 
