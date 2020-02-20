@@ -1,2 +1,3 @@
 # BlaNiRaYo
-#Lol
+
+pip install -e . --user
