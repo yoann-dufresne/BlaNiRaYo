@@ -37,6 +37,4 @@ class Library:
         """A potential heuristic measure of library potential interest."""
         time_bookflow = time_avail - self.signup
         nb_books_scannable = time_bookflow // self.ship
-        return sum(b.score for b in mask_books(
-            self.worthy_books_first[:nb_books_scannable],
-            avoid)
+        return sum(b.score for b in mask_books(self.worthy_books_first[:nb_books_scannable], avoid))
