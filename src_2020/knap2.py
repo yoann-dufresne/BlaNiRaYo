@@ -25,8 +25,8 @@ l = [m.add_var(var_type=BINARY) for i in L]
 b = [m.add_var(var_type=BINARY) for i in B]
 
 #m.objective = maximize(xsum(p[i] * x[i] for i in I))
-#m.objective = maximize(xsum(scores[i] * b[i] for i in B))
-#m.objective = maximize(xsum(scores[i] * b[i] for i in B) + xsum(libs[i].signup * l[i] for i in L))
+m.objective = maximize(xsum(scores[i] * b[i] for i in B))
+#m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 10*xsum(-libs[i].signup * l[i] for i in L))
 
 m += xsum(w[i] * l[i] for i in L) <= nb_days
 
@@ -46,9 +46,9 @@ for bi in B:
     m += b[bi] <= xsum(l[li] for li in libs_having_book[bi])
 
 #m.optimize(max_seconds=60)
-m.optimize(max_seconds=60, relax=True)
+m.optimize(max_seconds=100, relax=True)
 #m.optimize(max_solutions=1,relax=True)
-#m.optimize(max_solutions=100,relax=True)
+#m.optimize(max_solutions=10,relax=True)
 
 libs_selected = [i for i in L if l[i].x >= 0.99]
 books_selected = [i for i in B if b[i].x >= 0.99]
