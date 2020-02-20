@@ -34,7 +34,7 @@ m.optimize()
 selected = [i for i in I if x[i].x >= 0.99]
 print(len(selected),'selected items out of ',nb_lib)#': {}'.format(selected))
 
-sol_filename = prefix + "_sol.txt" 
+sol_filename = "../res_2020/" +  prefix + "_sol.txt" 
 
 output(sol_filename,[libs[i] for i in selected])
 
