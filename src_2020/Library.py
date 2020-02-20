@@ -1,7 +1,8 @@
 
 class Library:
 
-    def __init__(self, signup, ship):
+    def __init__(self, ide, signup, ship):
+        self.ide = ide
         self.signup = signup
         self.ship = ship
         self.books = []
