@@ -36,9 +36,8 @@ class Library:
     def add_books_to_scan(self, books):
         self.books_to_scan.extend(books)
 
-    @property
-    def worthy_books_first(self):
-        return sorted(self.books, key=attrgetter("score"), reverse=True)
+    def worthy_books_first(self, time_available):
+        return sorted(self.books, key=attrgetter("score"), reverse=True)[:time_available*self.ship]
 
     def nb_books_scannable(self, time_avail):
         time_bookflow = time_avail - self.signup
@@ -48,8 +47,8 @@ class Library:
         """A potential heuristic measure of library potential interest."""
         # time_bookflow = time_avail - self.signup
         # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
+        nb_books_scannable = self.nb_books_scannable(time_avail-self.signup)
 
-        return sum(b.score for b in mask_books(self.worthy_books_first[:nb_books_scannable], avoid))
+        return sum(b.score for b in mask_books(self.worthy_books_first(time_avail-self.signup)[:nb_books_scannable], avoid))
 
 
