@@ -1,5 +1,6 @@
 from src_2020.Parser import parse
 from src_2020.Outputer import output
+from src_2020.Library import mask_books
 import sys
 
 
@@ -28,4 +29,13 @@ m.optimize()
 selected = [i for i in I if x[i].x >= 0.99]
 print(len(selected),'selected items out of ',nb_lib)#': {}'.format(selected))
 
-output("sol.txt",[libs[i] for i in selected])
+libs = [libs[i] for i in selected]
+
+forbidden = set()
+libs.sort(key=lambda x: x.interest1(nb_days, avoid=forbidden))
+for lib in libs:
+    # Selection livres
+    lib.books_to_scan = [x for x in mask_books(lib.worthy_books_first())]
+    forbidden = forbidden + set(lib.books_to_scan)
+
+output("res_2020/sol.txt", libs)

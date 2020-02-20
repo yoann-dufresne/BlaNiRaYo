@@ -13,5 +13,5 @@ def output(filename, used_lib):
         for j in i.books_to_scan:
             to_print += str(j.ide) + " "
         to_print += "\n"
-    with open("../res_2020/" + filename, "w") as output_file:
+    with open(filename, "w") as output_file:
         output_file.write(to_print)
