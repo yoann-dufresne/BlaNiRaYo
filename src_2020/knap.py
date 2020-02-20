@@ -35,7 +35,7 @@ forbidden = set()
 libs.sort(key=lambda x: x.interest1(nb_days, avoid=forbidden))
 for lib in libs:
     # Selection livres
-    lib.books_to_scan = [x for x in mask_books(lib.worthy_books_first())]
-    forbidden = forbidden + set(lib.books_to_scan)
+    lib.books_to_scan = [x for x in mask_books(lib.worthy_books_first, forbidden)]
+    forbidden |= set(lib.books_to_scan)
 
 output("res_2020/sol.txt", libs)
