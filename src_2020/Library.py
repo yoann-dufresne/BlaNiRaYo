@@ -10,6 +10,9 @@ class Library:
     def add_books(self, books):
         self.books = books
 
+    def sort_books(self):
+        pass
+
 class Book:
 
     def __init__(self, ide, score):
