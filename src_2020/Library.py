@@ -54,7 +54,7 @@ class Library:
         # nb_books_scannable = time_bookflow // self.ship
         nb_books_scannable = self.nb_books_scannable(time_avail-self.signup)
 
-        return sum(b.score for b in mask_books(self.worthy_books_first(time_avail-self.signup)[:nb_books_scannable], avoid))
+        return sum(b.weighted_score for b in mask_books(self.worthy_books_first(time_avail-self.signup)[:nb_books_scannable], avoid))
 
     def interest2(self, time_avail, avoid=set()):
         """A potential heuristic measure of library potential interest. using frequencies"""
