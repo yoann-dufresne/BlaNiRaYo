@@ -51,5 +51,6 @@ while len(lib_set) > 0:
     # Selection livres
     max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first, forbidden)]
     forbidden |= set(max_lib.books_to_scan)
+    nb_days -= max_lib.signup
 
-output(sol_filename, libs)
+output(sol_filename, libs_sol)
