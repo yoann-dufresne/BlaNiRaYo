@@ -42,6 +42,7 @@ forbidden = set()
 lib_set = set(libs)
 libs_sol = []
 while len(lib_set) > 0:
+    print(len(lib_set))
     max_lib = max(lib_set, key=lambda x: x.interest1(nb_days, avoid=forbidden))
     libs_sol.append(max_lib)
     lib_set.remove(max_lib)

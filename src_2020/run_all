@@ -1,0 +1,4 @@
+for f in `ls ../data/*.txt`
+do
+	python knap.py $f
+done
