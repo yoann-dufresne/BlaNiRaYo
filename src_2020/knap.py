@@ -42,14 +42,16 @@ forbidden = set()
 lib_set = set(libs)
 libs_sol = []
 while len(lib_set) > 0:
+    print(len(lib_set))
     max_lib = max(lib_set, key=lambda x: x.interest1(nb_days, avoid=forbidden))
     libs_sol.append(max_lib)
     lib_set.remove(max_lib)
     # Selection livres
     max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first, forbidden)]
     forbidden |= set(max_lib.books_to_scan)
+    nb_days -= max_lib.signup
 
-output(sol_filename, libs)
+output(sol_filename, libs_sol)
 
 score = scorer(sys.argv[1],sol_filename)
 print("score",score)
