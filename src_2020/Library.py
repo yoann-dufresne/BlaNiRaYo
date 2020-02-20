@@ -8,9 +8,10 @@ class Book:
 
 
 def mask_books(books, avoid):
-    for book in books:
-        if book not in avoid:
-            yield book
+    return [b for b in books if b not in avoid]
+    # for book in books:
+    #     if book not in avoid:
+    #         yield book
 
 
 class Library:
