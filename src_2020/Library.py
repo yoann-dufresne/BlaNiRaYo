@@ -26,24 +26,28 @@ class Library:
         # List of books to scan /!\ ORDER IS IMPORTANT
         self.books_to_scan = []
 
+    def __lt__(self, other):
+        return len(self.books) < len(other.books)
+
     def add_books(self, books):
         self.books.extend(books)
 
     def add_books_to_scan(self, books):
         self.books_to_scan.extend(books)
 
-    def sort_books(self):
-        pass
-
-
     @property
     def worthy_books_first(self):
         return sorted(self.books, key=attrgetter("score"), reverse=True)
 
+    def nb_books_scannable(self, time_avail):
+        time_bookflow = time_avail - self.signup
+        return time_bookflow // self.ship
+
     def interest1(self, time_avail, avoid=set()):
         """A potential heuristic measure of library potential interest."""
-        time_bookflow = time_avail - self.signup
-        nb_books_scannable = time_bookflow // self.ship
+        # time_bookflow = time_avail - self.signup
+        # nb_books_scannable = time_bookflow // self.ship
+        nb_books_scannable = self.nb_books_scannable(time_avail)
 
         return sum(b.score for b in mask_books(self.worthy_books_first[:nb_books_scannable], avoid))
 
