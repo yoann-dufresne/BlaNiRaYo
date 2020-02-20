@@ -21,10 +21,16 @@ class Library:
         self.signup = signup
         # book "bandwidth"
         self.ship = ship
+        # List of books
         self.books = []
+        # List of books to scan /!\ ORDER IS IMPORTANT
+        self.books_to_scan = []
 
     def add_books(self, books):
         self.books.append(books)
+
+    def add_books_to_scan(self, books):
+        self.books_to_scan.append(books)
 
     def sort_books(self):
         pass
@@ -39,4 +45,4 @@ class Library:
         nb_books_scannable = time_bookflow // self.ship
         return sum(b.score for b in mask_books(
             self.worthy_books_first[:nb_books_scannable],
-            avoid)
+            avoid))

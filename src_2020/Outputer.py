@@ -8,9 +8,9 @@ def output(filename, used_lib):
     to_print += str(len(used_lib)) + "\n"
     # ID of the library0 | the number of books to be scanned from library 0
     for i in used_lib:
-        to_print += str(i.ide) + " " + str(len(i.books)) + "\n"
+        to_print += str(i.ide) + " " + str(len(i.books_to_scan)) + "\n"
         # IDs of the books to scan from 0 in the order that they are scanned
-        for j in i.books:
+        for j in i.books_to_scan:
             to_print += str(j.ide) + " "
         to_print += "\n"
     with open("../res_2020/" + filename, "w") as output_file:
