@@ -42,10 +42,14 @@ sol_filename = "../res_2020/" +  prefix + "_sol.txt"
 libs = [libs[i] for i in selected]
 
 forbidden = set()
-libs.sort(key=lambda x: x.interest1(nb_days, avoid=forbidden))
-for lib in libs:
-    # Selection livres-
-    lib.books_to_scan = [x for x in mask_books(lib.worthy_books_first, forbidden)]
-    forbidden |= set(lib.books_to_scan)
+lib_set = set(libs)
+libs_sol = []
+while len(lib_set) > 0:
+    max_lib = max(lib_set, key=lambda x: x.interest1(nb_days, avoid=forbidden))
+    libs_sol.append(max_lib)
+    lib_set.remove(max_lib)
+    # Selection livres
+    max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first, forbidden)]
+    forbidden |= set(max_lib.books_to_scan)
 
 output("res_2020/sol.txt", libs)
