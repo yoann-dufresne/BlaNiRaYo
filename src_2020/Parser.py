@@ -8,14 +8,24 @@ def parse(source=None):
         source = open(source)
     nb_books, nb_lib, nb_days = [int(x) for x in source.readline().strip().split(' ')]
     scores = [int(x) for x in source.readline().strip().split(' ')]
+    frequences = [0]*nb_books
 
     libs = []
     for l in range(nb_lib):
         lib_values = [int(x) for x in source.readline().strip().split(' ')]
         lib = Library(l, lib_values[1], lib_values[2])
         books = [Book(int(x), scores[int(x)]) for x in source.readline().strip().split(' ')]
+        for b in books:
+            frequences[b.ide] += 1
         lib.add_books(books)
         libs.append(lib)
+
+    sum_books = sum(frequences)
+    frequences = [x/sum_books for x in frequences]
+
+    for lib in libs:
+        for book in lib.books:
+            book.frq = frequences[book.ide]
 
     return nb_books, nb_lib, nb_days, scores, libs
 
