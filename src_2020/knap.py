@@ -1,6 +1,7 @@
 from src_2020.Parser import parse
 from src_2020.Outputer import output
 from src_2020.Scorer import scorer
+from src_2020.Library import mask_books
 import sys
 
 if len(sys.argv) < 2:
@@ -37,5 +38,15 @@ sol_filename = prefix + "_sol.txt"
 
 output(sol_filename,[libs[i] for i in selected])
 
+"""
 #score = scorer(sys.argv[1],"../res_2020/" + sol_filename)
 #print("score",score)
+libs = [libs[i] for i in selected]
+
+forbidden = set()
+libs.sort(key=lambda x: x.interest1(nb_days, avoid=forbidden))
+for lib in libs:
+    # Selection livres
+    lib.books_to_scan = [x for x in mask_books(lib.worthy_books_first())]
+    forbidden = forbidden + set(lib.books_to_scan)
+"""
