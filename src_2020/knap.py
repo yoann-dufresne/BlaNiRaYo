@@ -13,7 +13,7 @@ nb_books, nb_lib, nb_days, scores, libs = parse(sys.argv[1])
 from mip import Model, xsum, maximize, BINARY
 
 w = [libs[i].signup for i in range(len(libs))]
-p = [1 for i in range(len(libs))]  # dummy interest score
+#p = [1 for i in range(len(libs))]  # dummy interest score
 p = [libs[i].interest1(nb_days) for i in range(len(libs))]
 I = list(range(len(libs)))
 
@@ -36,9 +36,6 @@ print(len(selected),'selected items out of ',nb_lib)#': {}'.format(selected))
 
 sol_filename = "res_2020/" +  prefix + "_sol.txt" 
 
-
-#score = scorer(sys.argv[1],"../res_2020/" + sol_filename)
-#print("score",score)
 libs = [libs[i] for i in selected]
 
 forbidden = set()
@@ -54,3 +51,6 @@ while len(lib_set) > 0:
     nb_days -= max_lib.signup
 
 output(sol_filename, libs_sol)
+
+score = scorer(sys.argv[1],sol_filename)
+print("score",score)
