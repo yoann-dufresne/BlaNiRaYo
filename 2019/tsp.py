@@ -30,7 +30,7 @@ prefix = sys.argv[1].split("_")[0]
 photos = []
 keywords = {}
 
-# load data file
+# load data_2019 file
 counter = 0
 for line in open(sys.argv[1]):
     if len(line.split()) == 1:
