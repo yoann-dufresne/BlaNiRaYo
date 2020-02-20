@@ -26,7 +26,7 @@ b = [m.add_var(var_type=BINARY) for i in B]
 
 #m.objective = maximize(xsum(p[i] * x[i] for i in I))
 m.objective = maximize(xsum(scores[i] * b[i] for i in B))
-#m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 10*xsum(-libs[i].signup * l[i] for i in L))
+#m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 1000*xsum(-libs[i].signup * l[i] for i in L))
 
 m += xsum(w[i] * l[i] for i in L) <= nb_days
 
