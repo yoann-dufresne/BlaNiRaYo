@@ -30,7 +30,7 @@ class Library:
         self.books.extend(books)
 
     def add_books_to_scan(self, books):
-        self.books_to_scan.append(books)
+        self.books_to_scan.extend(books)
 
     def sort_books(self):
         pass
