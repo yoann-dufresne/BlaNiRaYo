@@ -1,4 +1,4 @@
 for f in `ls ../data/*.txt`
 do
-	python knap.py $f
+	python knap2.py $f
 done
