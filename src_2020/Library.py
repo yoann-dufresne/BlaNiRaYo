@@ -8,3 +8,9 @@ class Library:
 
     def add_books(self, books):
         self.books = books
+
+class Book:
+
+    def __init__(self, ide, score):
+        self.ide = ide
+        self.score = score
