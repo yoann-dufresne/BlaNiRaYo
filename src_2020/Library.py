@@ -27,7 +27,7 @@ class Library:
         self.books_to_scan = []
 
     def add_books(self, books):
-        self.books.append(books)
+        self.books.extend(books)
 
     def add_books_to_scan(self, books):
         self.books_to_scan.append(books)
