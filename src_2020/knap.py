@@ -47,7 +47,7 @@ def update_lib_queue():
     remaining_libs = [lib for x,lib in lib_q]
     lib_q = []
     for lib in remaining_libs:
-        heapq.heappush(lib_q, (lib.interest1(nb_days, avoid=forbidden), lib))
+        heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=forbidden), lib))
 iteration = 0
 update_lib_queue()
 while len(lib_q) > 0:
