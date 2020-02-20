@@ -24,12 +24,7 @@ class Library:
 
     @property
     def worthy_books_first(self):
-        return sorted(
-            self.books,
-            key=attrgetter("score"),
-            reverse=True)
-
-class Book:
+        return sorted(self.books, key=attrgetter("score"), reverse=True)
 
     def interest1(self, time_avail):
         """A potential heuristic measure of library potential interest."""
