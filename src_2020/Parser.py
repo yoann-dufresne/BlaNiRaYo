@@ -12,7 +12,7 @@ def parse(source=None):
     libs = []
     for l in range(nb_lib):
         lib_values = [int(x) for x in source.readline().strip().split(' ')]
-        lib = Library(lib_values[1], lib_values[2])
+        lib = Library(0, lib_values[1], lib_values[2])
         lib.add_books([int(x) for x in source.readline().strip().split(' ')])
         libs.append(lib)
 
