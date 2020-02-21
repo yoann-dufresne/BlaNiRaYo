@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     exit("args: input_file.txt")
 
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
-nb_books, nb_lib, nb_days, scores, libs = parse(sys.argv[1])
+nb_books, nb_lib, nb_days, scores, libs, books = parse(sys.argv[1])
 
 from mip import Model, xsum, maximize, BINARY
 
@@ -52,8 +52,8 @@ m.optimize(max_seconds=100, relax=True)
 
 libs_selected = [i for i in L if l[i].x >= 0.99]
 books_selected = [i for i in B if b[i].x >= 0.99]
-print(len(libs_selected),'selected libraries out of ',nb_lib)
-print(len(books_selected),'selected books out of ',nb_books)
+print(len(libs_selected), 'selected libraries out of ', nb_lib)
+print(len(books_selected), 'selected books out of ', nb_books)
 
 sol_filename = "res_2020/" +  prefix + "_sol.txt" 
 

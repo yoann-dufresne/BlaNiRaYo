@@ -2,6 +2,6 @@ import sys
 from src_2020.Parser import parse
 
 if __name__ == "__main__":
-    _, _, _, scores, libs = parse()
+    nb_books, nb_libs, nb_days, scores, libs, books = parse()
 
     print(scores)

@@ -1,7 +1,12 @@
 from operator import attrgetter
 from collections import Counter
 
+
+get_score = attrgetter("score")
+
+
 class Book:
+    __slots__ = ("ide", "score", "frq")
 
     def __init__(self, ide, score):
         self.ide = ide
@@ -19,12 +24,10 @@ class Book:
 
 def mask_books(books, avoid):
     return [b for b in books if b not in avoid]
-    # for book in books:
-    #     if book not in avoid:
-    #         yield book
 
 
 class Library:
+    __slots__ = ("ide", "signup", "ship", "books", "books_to_scan", "signed", "urgency")
 
     def __init__(self, ide, signup, ship):
         self.ide = ide
@@ -32,19 +35,43 @@ class Library:
         self.signup = signup
         # book "bandwidth"
         self.ship = ship
+        # A library should be queried early if it has
+        # - a long signup time
+        # - low shipping capacity
+        # - lots of (valuable) books
+        self.urgency = self.signup / self.ship
         # List of books
         self.books = []
         # List of books to scan /!\ ORDER IS IMPORTANT
         self.books_to_scan = []
+        # has the library been signed into?
+        self.signed = False
 
     def __lt__(self, other):
         return len(self.books) < len(other.books)
 
+
     def add_books(self, books):
         self.books.extend(books)
+        # Might speed up removal if high scores tend to be removed first
+        self.books.sort(key=get_score)
 
     def add_books_to_scan(self, books):
         self.books_to_scan.extend(books)
+
+    def books_by_worth(self, book_quality_fun=get_score, time_available=None, avoid=set()):
+        if time_available is None:
+            return sorted(
+                mask_books(self.books, avoid),
+                key=book_quality_fun, reverse=True)
+        elif self.signed:
+            return sorted(
+                mask_books(self.books, avoid),
+                key=book_quality_fun, reverse=True)[:time_available * self.ship]
+        else:
+            return sorted(
+                mask_books(self.books, avoid),
+                key=book_quality_fun, reverse=True)[:max(0, time_available - self.signup) * self.ship]
 
     def worthy_books_first(self, time_available):
         return sorted(self.books, key=attrgetter("weighted_score"), reverse=True)[:time_available*self.ship]
