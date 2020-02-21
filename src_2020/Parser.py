@@ -1,4 +1,5 @@
 import sys
+from collections import Counter
 from src_2020.Library import Library, Book
 
 def parse(source=None):
@@ -6,28 +7,23 @@ def parse(source=None):
         source = sys.stdin
     else:
         source = open(source)
-    nb_books, nb_lib, nb_days = [int(x) for x in source.readline().strip().split(' ')]
+    [nb_books, nb_lib, nb_days] = [int(x) for x in source.readline().strip().split(' ')]
     scores = [int(x) for x in source.readline().strip().split(' ')]
-    frequences = [0]*nb_books
+    book_freqs = Counter()
 
     libs = []
-    for l in range(nb_lib):
-        lib_values = [int(x) for x in source.readline().strip().split(' ')]
-        lib = Library(l, lib_values[1], lib_values[2])
-        books = [Book(int(x), scores[int(x)]) for x in source.readline().strip().split(' ')]
-        for b in books:
-            frequences[b.ide] += 1
-        lib.add_books(books)
+    for l_ide in range(nb_lib):
+        [l_nb_books, signup, ship] = [int(x) for x in source.readline().strip().split(' ')]
+        lib = Library(l_ide, signup, ship)
+        book_ids = [int(x) for x in source.readline().strip().split(' ')]
+        book_freqs.update(book_ids)
+        lib.add_books([Book(b_ide, scores[b_ide]) for b_ide in book_ids])
         libs.append(lib)
 
-    sum_books = sum(frequences)
-    frequences = [x/sum_books for x in frequences]
+    sum_books = sum(book_freqs.values())
 
     for lib in libs:
         for book in lib.books:
-            book.frq = frequences[book.ide]
+            book.frq = book_freqs[book.ide] / sum_books
 
     return nb_books, nb_lib, nb_days, scores, libs
-
-
-

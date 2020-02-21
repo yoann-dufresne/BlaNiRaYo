@@ -1,5 +1,5 @@
 import sys
-import Parser
+import src_2020.Parser as Parser
 
 def scorer(input_file, solution_file):
     _, _, nb_days, scores, libs = Parser.parse(input_file)
