@@ -2,7 +2,7 @@ import sys
 import src_2020.Parser as Parser
 
 def scorer(input_file, solution_file):
-    _, _, nb_days, scores, libs = Parser.parse(input_file)
+    _, _, nb_days, scores, libs, books = Parser.parse(input_file)
     all_books = set()
     # assumption: libs are in the order they'll output books
     day = 0

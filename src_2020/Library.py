@@ -50,6 +50,13 @@ class Library:
     def __lt__(self, other):
         return len(self.books) < len(other.books)
 
+    @property
+    def libsize(self):
+        return len(self.books)
+
+    @property
+    def libworth(self):
+        return sum(map(get_score, self.books))
 
     def add_books(self, books):
         self.books.extend(books)
