@@ -17,7 +17,7 @@ get_libworth = attrgetter("libworth")
 if __name__ == "__main__":
     if len(sys.argv) != 4:
         sys.stderr.write("Usage: cmd input_file output_file attribute\n")
-        sys.stderr.write("attribute to be chosen among\n", ", ".join(sort_attrs))
+        sys.stderr.write("attribute to be chosen among\n" + ", ".join(sort_attrs) + "\n")
         sys.exit(1)
     attrs = [sys.argv[3]]
     sort_keys = {
