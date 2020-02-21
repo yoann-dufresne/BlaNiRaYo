@@ -46,9 +46,9 @@ for bi in B:
     m += b[bi] <= xsum(l[li] for li in libs_having_book[bi])
 
 #m.optimize(max_seconds=60)
-m.optimize(max_seconds=100, relax=True)
+#m.optimize(max_seconds=100, relax=True)
 #m.optimize(max_solutions=1,relax=True)
-#m.optimize(max_solutions=10,relax=True)
+m.optimize(max_solutions=10,relax=True)
 
 libs_selected = [i for i in L if l[i].x >= 0.99]
 books_selected = [i for i in B if b[i].x >= 0.99]
@@ -59,16 +59,17 @@ sol_filename = "res_2020/" +  prefix + "_sol.txt"
 
 libs = [libs[i] for i in libs_selected]
 
+
 forbidden = set()
 libs_sol = []
 import heapq
 lib_q = [(0,x) for x in libs]
 def update_lib_queue():
-    global lib_q
+    global lib_q, nb_days, forbidden
     remaining_libs = [lib for x,lib in lib_q]
     lib_q = []
     for lib in remaining_libs:
-        heapq.heappush(lib_q, (-lib.interest2(nb_days, avoid=forbidden), lib))
+        heapq.heappush(lib_q, (-lib.interest2(nb_days, avoid=forbidden), lib)) # always use interest2 cause we want the highest scoring books we can get
 iteration = 0
 update_lib_queue()
 while len(lib_q) > 0:
@@ -80,7 +81,8 @@ while len(lib_q) > 0:
     #print(value,max_lib.worthy_books_first)
     libs_sol.append(max_lib)
     # Selection livres
-    max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first(nb_days), forbidden)]
+    max_books = max_lib.nb_books_scannable(nb_days)
+    max_lib.books_to_scan = mask_books(max_lib.worthy_books_first3(), forbidden)[:max_books]
     forbidden |= set(max_lib.books_to_scan)
     nb_days -= max_lib.signup
 
@@ -88,3 +90,4 @@ output(sol_filename, libs_sol)
 
 score = scorer(sys.argv[1],sol_filename)
 print("score",score)
+

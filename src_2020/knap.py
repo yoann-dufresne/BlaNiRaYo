@@ -14,7 +14,7 @@ from mip import Model, xsum, maximize, BINARY
 
 w = [libs[i].signup for i in range(len(libs))]
 #p = [1 for i in range(len(libs))]  # dummy interest score
-p = [libs[i].interest1(nb_days) for i in range(len(libs))]
+p = [libs[i].interest8(nb_days) for i in range(len(libs))]
 I = list(range(len(libs)))
 
 print("subscription times", w[:10])
@@ -27,7 +27,7 @@ x = [m.add_var(var_type=BINARY) for i in I]
 
 m.objective = maximize(xsum(p[i] * x[i] for i in I))
 
-m += xsum(w[i] * x[i] for i in I) <= nb_days
+m += xsum(w[i] * x[i] for i in I) <= nb_days+7 # doesn't matter if we go overboard, selection procedure at the end takes care of not overflowing time 
 
 m.optimize()
 
@@ -43,14 +43,14 @@ libs_sol = []
 import heapq
 lib_q = [(0,x) for x in libs]
 def update_lib_queue():
-    global lib_q
+    global lib_q, nb_days, forbidden
     remaining_libs = [lib for x,lib in lib_q]
     lib_q = []
     for lib in remaining_libs:
-        heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=forbidden), lib))
+        heapq.heappush(lib_q, (-lib.interest2(nb_days, avoid=forbidden), lib)) # using interest2 cause we want the highest scoring books we can get
 iteration = 0
 update_lib_queue()
-while len(lib_q) > 0:
+while len(lib_q) > 0 and nb_days > 0:
     if nb_lib < 10000 or iteration % 50 == 1:
         update_lib_queue()
     iteration += 1
@@ -59,7 +59,8 @@ while len(lib_q) > 0:
     #print(value,max_lib.worthy_books_first)
     libs_sol.append(max_lib)
     # Selection livres
-    max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first(nb_days), forbidden)]
+    max_books = max_lib.nb_books_scannable(nb_days)
+    max_lib.books_to_scan = mask_books(max_lib.worthy_books_first3(), forbidden)[:max_books]
     forbidden |= set(max_lib.books_to_scan)
     nb_days -= max_lib.signup
 
