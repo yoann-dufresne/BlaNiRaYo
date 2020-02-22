@@ -7,12 +7,7 @@ from collections import Counter
 from src_2020.Parser import parse
 from src_2020.Outputer import output
 
-sort_attrs = ["ship", "invship", "signup", "urgency", "libsize", "libworth", "daysneed", "invdaysneed"]
-# get_ship = attrgetter("ship")
-# get_signup = attrgetter("signup")
-# get_urgency = attrgetter("urgency")
-# get_libsize = attrgetter("libsize")
-# get_libworth = attrgetter("libworth")
+sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed"]
 sort_keys = {
     attr: attrgetter(attr)
     for attr in sort_attrs}
@@ -55,30 +50,37 @@ if __name__ == "__main__":
     best_attr = None
     for attr in attrs:
         sort_key = sort_keys[attr]
-        nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
-        time_available = nb_days
-        # these_libs = deepcopy(libs)
-        libs_order = []
-        avoid = set()
-        for lib in sorted(libs, key=sort_key):
-            books_to_scan = lib.books_by_worth(
-                time_available=time_available,
-                avoid=avoid)
-            if books_to_scan:
-                lib.books_to_scan.extend(books_to_scan)
-                lib.signed = True
-                avoid |= set(books_to_scan)
-                libs_order.append(lib)
-                time_available -= lib.signup
-                if time_available <= 0:
-                    break
-        this_score = sum(b.score for b in avoid)
-        print(f"Solution sorting on {attr:15}: {this_score:>10}")
-        if this_score > best_score:
-            best_score = this_score
-            best_sol = deepcopy(libs_order)
-            best_avoid = avoid
-            best_attr = attr
+        for do_rev in [False, True]:
+            nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
+            time_available = nb_days
+            # these_libs = deepcopy(libs)
+            libs_order = []
+            avoid = set()
+            for lib in sorted(libs, key=sort_key, reverse=do_rev):
+                books_to_scan = lib.books_by_worth(
+                    time_available=time_available,
+                    avoid=avoid)
+                if books_to_scan:
+                    lib.books_to_scan.extend(books_to_scan)
+                    lib.signed = True
+                    avoid |= set(books_to_scan)
+                    libs_order.append(lib)
+                    time_available -= lib.signup
+                    if time_available <= 0:
+                        break
+            this_score = sum(b.score for b in avoid)
+            if do_rev:
+                print(f"Solution rev sorting on {attr:15}: {this_score:>10}")
+            else:
+                print(f"Solution fwd sorting on {attr:15}: {this_score:>10}")
+            if this_score > best_score:
+                best_score = this_score
+                best_sol = deepcopy(libs_order)
+                best_avoid = avoid
+                if do_rev:
+                    best_attr = f"rev_{attr}"
+                else:
+                    best_attr = f"fwd_{attr}"
     max_score = sum(b.score for b in books.values())
     print(f"\nBest solution found sorting on {best_attr}")
     print(f"  Score: {best_score} / {max_score}")
