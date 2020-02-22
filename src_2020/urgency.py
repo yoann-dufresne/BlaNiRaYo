@@ -7,7 +7,7 @@ from collections import Counter
 from src_2020.Parser import parse
 from src_2020.Outputer import output
 
-sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth"]
+sort_attrs = ["ship", "invship", "signup", "urgency", "libsize", "libworth", "daysneed", "invdaysneed"]
 # get_ship = attrgetter("ship")
 # get_signup = attrgetter("signup")
 # get_urgency = attrgetter("urgency")
@@ -36,36 +36,6 @@ def problem_stats(problem_file):
         else:
             info = f"{min(counters[attr].keys())} -> {max(counters[attr].keys())}"
         print(f"  Number of distinct values for {attr}: {len(counters[attr])} ({info})")
-    # ships = Counter(map(get_ship, libs))
-    # signups = Counter(map(get_signup, libs))
-    # urgencies = Counter(map(get_urgency, libs))
-    # libsizes = Counter(map(get_libsize, libs))
-    # libworths = Counter(map(get_libworth, libs))
-    # if len(libsizes) <= 20:
-    #     info = ", ".join(map(str, sorted(libsizes.keys())))
-    # else:
-    #     info = f"{min(libsizes.keys())} -> {max(libsizes.keys())}"
-    # print(f"  Number of distinct library sizes: {len(libsizes)} ({info})")
-    # if len(ships) <= 20:
-    #     info = ", ".join(map(str, sorted(ships.keys())))
-    # else:
-    #     info = f"{min(ships.keys())} -> {max(ships.keys())}"
-    # print(f"  Number of distinct ships: {len(ships)} ({info})")
-    # if len(signups) <= 20:
-    #     info = ", ".join(map(str, sorted(signups.keys())))
-    # else:
-    #     info = f"{min(signups.keys())} -> {max(signups.keys())}"
-    # print(f"  Number of distinct signups: {len(signups)} ({info})")
-    # if len(libworths) <= 20:
-    #     info = ", ".join(map(str, sorted(libworths.keys())))
-    # else:
-    #     info = f"{min(libworths.keys())} -> {max(libworths.keys())}"
-    # print(f"  Number of distinct libworths: {len(libworths)} ({info})")
-    # if len(urgencies) <= 20:
-    #     info = ", ".join(map(str, sorted(urgencies.keys())))
-    # else:
-    #     info = f"{min(urgencies.keys())} -> {max(urgencies.keys())}"
-    # print(f"  Number of distinct urgencies: {len(urgencies)} ({info})")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -103,7 +73,7 @@ if __name__ == "__main__":
                 if time_available <= 0:
                     break
         this_score = sum(b.score for b in avoid)
-        print(f"Solution sorting on {attr}: {this_score}")
+        print(f"Solution sorting on {attr:15}: {this_score:>10}")
         if this_score > best_score:
             best_score = this_score
             best_sol = deepcopy(libs_order)

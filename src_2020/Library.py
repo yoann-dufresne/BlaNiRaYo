@@ -27,7 +27,7 @@ def mask_books(books, avoid):
 
 
 class Library:
-    __slots__ = ("ide", "signup", "ship", "books", "books_to_scan", "signed", "urgency")
+    __slots__ = ("ide", "signup", "ship", "books", "books_to_scan", "signed", "urgency", "invship")
 
     def __init__(self, ide, signup, ship):
         self.ide = ide
@@ -35,6 +35,7 @@ class Library:
         self.signup = signup
         # book "bandwidth"
         self.ship = ship
+        self.invship = 1.0 / ship
         # A library should be queried early if it has
         # - a long signup time
         # - low shipping capacity
@@ -53,6 +54,17 @@ class Library:
     @property
     def libsize(self):
         return len(self.books)
+
+    @property
+    def daysneed(self):
+        """
+        Number of days necessary to signup and send all books
+        """
+        return (len(self.books) / self.ship) + self.signup
+
+    @property
+    def invdaysneed(self):
+        return 1 / self.daysneed
 
     @property
     def libworth(self):
