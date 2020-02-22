@@ -27,7 +27,7 @@ def mask_books(books, avoid):
 
 
 class Library:
-    __slots__ = ("ide", "signup", "ship", "books", "books_to_scan", "signed", "urgency")
+    __slots__ = ("ide", "signup", "ship", "books", "books_to_scan", "signed", "urgency", "signup_on")
 
     def __init__(self, ide, signup, ship):
         self.ide = ide
@@ -47,6 +47,8 @@ class Library:
         self.books_to_scan = []
         # has the library been signed into?
         self.signed = False
+        # if so, when has it been signed into
+        self.signup_on = -1
 
     def __lt__(self, other):
         return len(self.books) < len(other.books)

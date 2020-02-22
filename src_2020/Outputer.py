@@ -11,7 +11,10 @@ def output(filename, used_lib):
         to_print += str(i.ide) + " " + str(len(i.books_to_scan)) + "\n"
         # IDs of the books to scan from 0 in the order that they are scanned
         for j in i.books_to_scan:
-            to_print += str(j.ide) + " "
+            if type(j) is int:
+                to_print += str(j) + " "
+            else:
+                to_print += str(j.ide) + " "
         to_print += "\n"
     with open(filename, "w") as output_file:
         output_file.write(to_print)

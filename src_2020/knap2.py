@@ -46,9 +46,10 @@ for bi in B:
     m += b[bi] <= xsum(l[li] for li in libs_having_book[bi])
 
 #m.optimize(max_seconds=60)
-m.optimize(max_seconds=100, relax=True)
+#m.optimize(max_seconds=100, relax=True)
 #m.optimize(max_solutions=1,relax=True)
 #m.optimize(max_solutions=10,relax=True)
+m.optimize(max_solutions=100,relax=True)
 
 libs_selected = [i for i in L if l[i].x >= 0.99]
 books_selected = [i for i in B if b[i].x >= 0.99]
@@ -68,7 +69,7 @@ def update_lib_queue():
     remaining_libs = [lib for x,lib in lib_q]
     lib_q = []
     for lib in remaining_libs:
-        heapq.heappush(lib_q, (-lib.interest2(nb_days, avoid=forbidden), lib))
+        heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=forbidden), lib))
 iteration = 0
 update_lib_queue()
 while len(lib_q) > 0:
@@ -80,9 +81,9 @@ while len(lib_q) > 0:
     #print(value,max_lib.worthy_books_first)
     libs_sol.append(max_lib)
     # Selection livres
+    nb_days -= max_lib.signup
     max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first(nb_days), forbidden)]
     forbidden |= set(max_lib.books_to_scan)
-    nb_days -= max_lib.signup
 
 output(sol_filename, libs_sol)
 

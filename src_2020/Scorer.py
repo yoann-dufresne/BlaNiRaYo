@@ -15,12 +15,15 @@ def scorer(input_file, solution_file):
             library_id, nb_books = map(int,line.strip().split())
         else:
             lib_books = list(map(int,line.strip().split()))
+            day += libs[library_id].signup
             #print("library",library_id,"nb_books",nb_books)
             #print("books:",lib_books)
             all_books |= set(lib_books)
             remaining_days = nb_days - day
+            if len(lib_books) > remaining_days * libs[library_id].ship:
+                print("warning! library",library_id,"outputs more books than it has time for (%d > %d)" % (len(lib_books), remaining_days * libs[library_id].ship))
 
-    print(len(all_books),"books total were selected")
+    print(len(all_books),"books total were selected, ",remaining_days,"unused signup day(s)")
     #print(all_books)
 
     total_score = 0
