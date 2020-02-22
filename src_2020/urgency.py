@@ -8,66 +8,85 @@ from src_2020.Parser import parse
 from src_2020.Outputer import output
 
 sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth"]
-get_ship = attrgetter("ship")
-get_signup = attrgetter("signup")
-get_urgency = attrgetter("urgency")
-get_libsize = attrgetter("libsize")
-get_libworth = attrgetter("libworth")
+# get_ship = attrgetter("ship")
+# get_signup = attrgetter("signup")
+# get_urgency = attrgetter("urgency")
+# get_libsize = attrgetter("libsize")
+# get_libworth = attrgetter("libworth")
+sort_keys = {
+    attr: attrgetter(attr)
+    for attr in sort_attrs}
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        sys.stderr.write("Usage: cmd input_file output_file attribute\n")
-        sys.stderr.write("attribute to be chosen among\n", ", ".join(sort_attrs))
-        sys.exit(1)
-    attrs = [sys.argv[3]]
-    sort_keys = {
-        attr: attrgetter(attr)
-        for attr in attrs}
 
-    nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
+def problem_stats(problem_file):
+    nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
     time_available = nb_days
     scores_counter = Counter(scores)
-    ships = Counter(map(get_ship, libs))
-    signups = Counter(map(get_signup, libs))
-    urgencies = Counter(map(get_urgency, libs))
-    libsizes = Counter(map(get_libsize, libs))
-    libworths = Counter(map(get_libworth, libs))
+    counters = {
+        attr: Counter(map(sort_keys[attr], libs))
+        for attr in sort_attrs}
     print(f"Problem {sys.argv[1]}")
     print(f"  Number of books: {nb_books}")
     print(f"  Number of distinct scores: {len(scores_counter)}")
     print(f"  Number of libraries: {nb_libs}")
     print(f"  Number of days: {nb_days}")
-    if len(libsizes) <= 20:
-        info = ", ".join(map(str, sorted(libsizes.keys())))
+    for attr in sort_attrs:
+        if len(counters[attr]) <= 20:
+            info = ", ".join(map(str, sorted(counters[attr].keys())))
+        else:
+            info = f"{min(counters[attr].keys())} -> {max(counters[attr].keys())}"
+        print(f"  Number of distinct values for {attr}: {len(counters[attr])} ({info})")
+    # ships = Counter(map(get_ship, libs))
+    # signups = Counter(map(get_signup, libs))
+    # urgencies = Counter(map(get_urgency, libs))
+    # libsizes = Counter(map(get_libsize, libs))
+    # libworths = Counter(map(get_libworth, libs))
+    # if len(libsizes) <= 20:
+    #     info = ", ".join(map(str, sorted(libsizes.keys())))
+    # else:
+    #     info = f"{min(libsizes.keys())} -> {max(libsizes.keys())}"
+    # print(f"  Number of distinct library sizes: {len(libsizes)} ({info})")
+    # if len(ships) <= 20:
+    #     info = ", ".join(map(str, sorted(ships.keys())))
+    # else:
+    #     info = f"{min(ships.keys())} -> {max(ships.keys())}"
+    # print(f"  Number of distinct ships: {len(ships)} ({info})")
+    # if len(signups) <= 20:
+    #     info = ", ".join(map(str, sorted(signups.keys())))
+    # else:
+    #     info = f"{min(signups.keys())} -> {max(signups.keys())}"
+    # print(f"  Number of distinct signups: {len(signups)} ({info})")
+    # if len(libworths) <= 20:
+    #     info = ", ".join(map(str, sorted(libworths.keys())))
+    # else:
+    #     info = f"{min(libworths.keys())} -> {max(libworths.keys())}"
+    # print(f"  Number of distinct libworths: {len(libworths)} ({info})")
+    # if len(urgencies) <= 20:
+    #     info = ", ".join(map(str, sorted(urgencies.keys())))
+    # else:
+    #     info = f"{min(urgencies.keys())} -> {max(urgencies.keys())}"
+    # print(f"  Number of distinct urgencies: {len(urgencies)} ({info})")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        sys.stderr.write("Usage: cmd input_file output_file [attribute]\n")
+        sys.stderr.write("attribute to be chosen among\n", ", ".join(sort_attrs))
+        sys.exit(1)
+    if len(sys.argv) == 4:
+        attrs = [sys.argv[3]]
     else:
-        info = f"{min(libsizes.keys())} -> {max(libsizes.keys())}"
-    print(f"  Number of distinct library sizes: {len(libsizes)} ({info})")
-    if len(ships) <= 20:
-        info = ", ".join(map(str, sorted(ships.keys())))
-    else:
-        info = f"{min(ships.keys())} -> {max(ships.keys())}"
-    print(f"  Number of distinct ships: {len(ships)} ({info})")
-    if len(signups) <= 20:
-        info = ", ".join(map(str, sorted(signups.keys())))
-    else:
-        info = f"{min(signups.keys())} -> {max(signups.keys())}"
-    print(f"  Number of distinct signups: {len(signups)} ({info})")
-    if len(libworths) <= 20:
-        info = ", ".join(map(str, sorted(libworths.keys())))
-    else:
-        info = f"{min(libworths.keys())} -> {max(libworths.keys())}"
-    print(f"  Number of distinct libworths: {len(libworths)} ({info})")
-    if len(urgencies) <= 20:
-        info = ", ".join(map(str, sorted(urgencies.keys())))
-    else:
-        info = f"{min(urgencies.keys())} -> {max(urgencies.keys())}"
-    print(f"  Number of distinct urgencies: {len(urgencies)} ({info})")
-    # TODO: Why are there side effects (quick score decrease)?
+        attrs = sort_attrs
+    problem_file = sys.argv[1]
+    problem_stats(problem_file)
+    # TODO: Why are there side effects (quick score decrease in the loop over attrs)?
     best_score = 0
     best_sol = []
     best_avoid = None
     best_attr = None
-    for (attr, sort_key) in sort_keys.items():
+    for attr in attrs:
+        sort_key = sort_keys[attr]
+        nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
+        time_available = nb_days
         # these_libs = deepcopy(libs)
         libs_order = []
         avoid = set()
