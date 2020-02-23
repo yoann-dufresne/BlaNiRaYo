@@ -41,7 +41,7 @@ sol_filename = "res_2020/" +  prefix + "_sol.txt"
 
 libs = [libs[i] for i in selected]
 
-forbidden = set()
+avoid = set()
 libs_sol = []
 import heapq
 lib_q = [(0,x) for x in libs]
@@ -50,22 +50,29 @@ def update_lib_queue():
     remaining_libs = [lib for x,lib in lib_q]
     lib_q = []
     for lib in remaining_libs:
-        heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=forbidden), lib))
+        heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=avoid), lib))
 iteration = 0
 update_lib_queue()
+time_available = nb_days
 while len(lib_q) > 0:
     if nb_lib < 10000 or iteration % 50 == 1:
         update_lib_queue()
     iteration += 1
     print(len(lib_q))
     value, max_lib = heapq.heappop(lib_q)
-    #print(value,max_lib.worthy_books_first)
     libs_sol.append(max_lib)
     # Selection livres
     nb_days -= max_lib.signup
-    max_lib.signed = True 
-    max_lib.books_to_scan = [x for x in max_lib.books_by_worth(time_available=nb_days, avoid=forbidden)]
-    forbidden |= set(max_lib.books_to_scan)
+    books_to_scan = max_lib.books_by_worth(
+                    time_available=nb_days,
+                    avoid=avoid)
+    max_lib.books_to_scan = books_to_scan
+    max_lib.signed = True
+    avoid |= set(books_to_scan)
+    time_available -= max_lib.signup
+    if time_available <= 0:
+        break
+
 
 output(sol_filename, libs_sol)
 
