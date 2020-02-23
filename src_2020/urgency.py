@@ -7,7 +7,7 @@ from collections import Counter
 from src_2020.Parser import parse
 from src_2020.Outputer import output
 
-sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed","urginvworth"]
+sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth"]
 sort_keys = {
     attr: attrgetter(attr)
     for attr in sort_attrs}
@@ -43,7 +43,6 @@ if __name__ == "__main__":
         attrs = sort_attrs
     problem_file = sys.argv[1]
     problem_stats(problem_file)
-    # TODO: Why are there side effects (quick score decrease in the loop over attrs)?
     best_score = 0
     best_sol = []
     best_avoid = None
@@ -53,7 +52,6 @@ if __name__ == "__main__":
         for do_rev in [False, True]:
             nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
             time_available = nb_days
-            # these_libs = deepcopy(libs)
             libs_order = []
             avoid = set()
             for lib in sorted(libs, key=sort_key, reverse=do_rev):

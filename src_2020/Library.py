@@ -35,7 +35,6 @@ class Library:
         self.signup = signup
         # book "bandwidth"
         self.ship = ship
-        # self.invship = 1.0 / ship
         # A library should be queried early if it has
         # - a long signup time
         # - low shipping capacity
@@ -54,6 +53,10 @@ class Library:
         return len(self.books) < len(other.books)
 
     @property
+    def libworth(self):
+        return sum(map(get_score, self.books))
+
+    @property
     def libsize(self):
         return len(self.books)
 
@@ -64,18 +67,9 @@ class Library:
         """
         return (len(self.books) / self.ship) + self.signup
 
-    # @property
-    # def invdaysneed(self):
-    #     return 1 / self.daysneed
-
-    @property
-    def libworth(self):
-        return sum(map(get_score, self.books))
-
     @property
     def urginvworth(self):
         return self.urgency / sum(map(get_score, self.books))**0.6
-
 
     def add_books(self, books):
         self.books.extend(books)
