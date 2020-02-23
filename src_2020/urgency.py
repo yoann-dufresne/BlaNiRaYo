@@ -4,43 +4,20 @@ import sys
 from copy import deepcopy
 from operator import attrgetter
 from collections import Counter
-from src_2020.Parser import parse
+from src_2020.Parser import parse, problem_stats
+from src_2020.Parser import lib_sort_keys as sort_keys
 from src_2020.Outputer import output
 
-sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth"]
-sort_keys = {
-    attr: attrgetter(attr)
-    for attr in sort_attrs}
-
-
-def problem_stats(problem_file):
-    nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
-    time_available = nb_days
-    scores_counter = Counter(scores)
-    counters = {
-        attr: Counter(map(sort_keys[attr], libs))
-        for attr in sort_attrs}
-    print(f"Problem {sys.argv[1]}")
-    print(f"  Number of books: {nb_books}")
-    print(f"  Number of distinct scores: {len(scores_counter)}")
-    print(f"  Number of libraries: {nb_libs}")
-    print(f"  Number of days: {nb_days}")
-    for attr in sort_attrs:
-        if len(counters[attr]) <= 20:
-            info = ", ".join(map(str, sorted(counters[attr].keys())))
-        else:
-            info = f"{min(counters[attr].keys())} -> {max(counters[attr].keys())}"
-        print(f"  Number of distinct values for {attr}: {len(counters[attr])} ({info})")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.stderr.write("Usage: cmd input_file output_file [attribute]\n")
-        sys.stderr.write("attribute to be chosen among\n", ", ".join(sort_attrs))
+        sys.stderr.write("attribute to be chosen among\n", ", ".join(sort_keys.keys()))
         sys.exit(1)
     if len(sys.argv) == 4:
         attrs = [sys.argv[3]]
     else:
-        attrs = sort_attrs
+        attrs = sort_keys.keys()
     problem_file = sys.argv[1]
     problem_stats(problem_file)
     best_score = 0

@@ -6,8 +6,8 @@ from operator import attrgetter
 from collections import Counter
 from src_2020.Parser import parse
 from src_2020.Outputer import output
-from src_2020.Library import Library 
-from src_2020.Scorer import scorer 
+from src_2020.Library import Library
+from src_2020.Scorer import scorer
 import random
 import copy
 from itertools import combinations
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 4:
         sys.stderr.write("Usage: cmd input_file solution_file output_file\n")
         sys.exit(1)
-    
+
     problem_file = sys.argv[1]
     nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     output_file = sys.argv[3]
     sol_libs, sol_days = solution_read(solution_file,libs) 
     old_score = solution_score(sol_libs,scores)
-    
+
     print("original solution, computing its score..")
     scorer(problem_file,solution_file)
 

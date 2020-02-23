@@ -1,5 +1,6 @@
 import sys
 from collections import Counter
+from operator import attrgetter
 from src_2020.Library import Library, Book
 
 def parse(source=None):
@@ -32,3 +33,29 @@ def parse(source=None):
     #         book.frq = book_freqs[book.ide] / sum_books
 
     return nb_books, nb_libs, nb_days, scores, libs, books
+
+
+lib_sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth"]
+lib_sort_keys = {
+    attr: attrgetter(attr)
+    for attr in lib_sort_attrs}
+
+
+def problem_stats(problem_file):
+    nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
+    time_available = nb_days
+    scores_counter = Counter(scores)
+    counters = {
+        attr: Counter(map(lib_sort_keys[attr], libs))
+        for attr in lib_sort_attrs}
+    print(f"Problem {sys.argv[1]}")
+    print(f"  Number of books: {nb_books}")
+    print(f"  Number of distinct scores: {len(scores_counter)}")
+    print(f"  Number of libraries: {nb_libs}")
+    print(f"  Number of days: {nb_days}")
+    for attr in lib_sort_attrs:
+        if len(counters[attr]) <= 20:
+            info = ", ".join(map(str, sorted(counters[attr].keys())))
+        else:
+            info = f"{min(counters[attr].keys())} -> {max(counters[attr].keys())}"
+        print(f"  Number of distinct values for {attr}: {len(counters[attr])} ({info})")

@@ -69,7 +69,7 @@ class Library:
 
     @property
     def urginvworth(self):
-        return self.urgency / sum(map(get_score, self.books))**0.6
+        return self.urgency / self.libworth**0.6
 
     def add_books(self, books):
         self.books.extend(books)
