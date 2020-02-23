@@ -7,7 +7,7 @@ from collections import Counter
 from src_2020.Parser import parse
 from src_2020.Outputer import output
 
-sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed"]
+sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed","urginvworth"]
 sort_keys = {
     attr: attrgetter(attr)
     for attr in sort_attrs}

@@ -1,6 +1,6 @@
 from operator import attrgetter
 from collections import Counter
-
+import math
 
 get_score = attrgetter("score")
 
@@ -71,6 +71,11 @@ class Library:
     @property
     def libworth(self):
         return sum(map(get_score, self.books))
+
+    @property
+    def urginvworth(self):
+        return self.urgency / sum(map(get_score, self.books))**0.6
+
 
     def add_books(self, books):
         self.books.extend(books)
