@@ -11,7 +11,7 @@ from src_2020.Scorer import scorer
 import random
 import copy
 from itertools import combinations
-random.seed(17)
+#random.seed(17)
 
 def solution_read(solution_file, libs):
     nb_libraries = None
