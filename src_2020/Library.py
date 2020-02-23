@@ -71,6 +71,11 @@ class Library:
     def urginvworth(self):
         return self.urgency / self.libworth**0.6
 
+    @property
+    def testing(self):
+        return self.urgency / self.libworth**0.6   / len(self.books)**0.11
+
+
     def add_books(self, books):
         self.books.extend(books)
         # Might speed up removal if high scores tend to be removed first

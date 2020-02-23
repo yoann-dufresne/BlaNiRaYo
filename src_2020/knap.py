@@ -15,7 +15,9 @@ from mip import Model, xsum, maximize, BINARY
 w = [libs[i].signup for i in range(len(libs))]
 # p = [1 for i in range(len(libs))]  # dummy interest score
 #p = [libs[i].interest1(nb_days) for i in range(len(libs))]
+#p = [1.0/libs[i].urginvworth for i in range(len(libs))]
 p = [1.0/libs[i].urgency for i in range(len(libs))]
+#p = [libs[i].libsize for i in range(len(libs))]
 I = list(range(len(libs)))
 
 print("subscription times", w[:10])
@@ -49,7 +51,6 @@ def update_lib_queue():
     lib_q = []
     for lib in remaining_libs:
         heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=forbidden), lib))
-        #heapq.heappush(lib_q, (lib.urgency, lib))
 iteration = 0
 update_lib_queue()
 while len(lib_q) > 0:
@@ -62,7 +63,8 @@ while len(lib_q) > 0:
     libs_sol.append(max_lib)
     # Selection livres
     nb_days -= max_lib.signup
-    max_lib.books_to_scan = [x for x in mask_books(max_lib.worthy_books_first(nb_days), forbidden)]
+    max_lib.signed = True 
+    max_lib.books_to_scan = [x for x in max_lib.books_by_worth(time_available=nb_days, avoid=forbidden)]
     forbidden |= set(max_lib.books_to_scan)
 
 output(sol_filename, libs_sol)

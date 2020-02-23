@@ -35,7 +35,7 @@ def parse(source=None):
     return nb_books, nb_libs, nb_days, scores, libs, books
 
 
-lib_sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth"]
+lib_sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth","testing"]
 lib_sort_keys = {
     attr: attrgetter(attr)
     for attr in lib_sort_attrs}

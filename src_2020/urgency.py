@@ -8,7 +8,6 @@ from src_2020.Parser import parse, problem_stats
 from src_2020.Parser import lib_sort_keys as sort_keys
 from src_2020.Outputer import output
 
-
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.stderr.write("Usage: cmd input_file output_file [attribute]\n")
