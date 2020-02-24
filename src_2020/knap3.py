@@ -17,7 +17,8 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
 
-def deduplicate_books(libs,duplication_threshold=2):
+def deduplicate_books(libs,duplication_threshold=1): 
+    #,nb_books_threshold=50): # not ready to do that kind of filtering, see below
     import heapq
     from copy import deepcopy
     from collections import Counter
@@ -33,8 +34,12 @@ def deduplicate_books(libs,duplication_threshold=2):
     # - making them as evenly containing books as possible
     # - force some libs to have as many books as poss (and schedule them at the beginning)
     #selection_function = lambda lib_i: len(dedup_libs[lib_i].books)
+    #selection_function = lambda lib_i: -len(dedup_libs[lib_i].books)
     #selection_function = lambda lib_i: lib_i
-    selection_function = lambda lib_i: len(dedup_libs[lib_i].books)/(lib_i+1)
+    #selection_function = lambda lib_i: len(dedup_libs[lib_i].books)/(lib_i+1)
+    #selection_function = lambda lib_i: -sum([book.score for book in dedup_libs[lib_i].books])
+    #selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
+    selection_function = lambda lib_i: -dedup_libs[lib_i].urgency
     for lib_i,lib in enumerate(dedup_libs):
         heapq.heappush(libq, (selection_function(lib_i), lib_i))
     while len(booksc) > 0:
@@ -51,6 +56,15 @@ def deduplicate_books(libs,duplication_threshold=2):
                 break
         if deleted_a_book: # if not: nothing to do anymore for this lib
             heapq.heappush(libq, (selection_function(lib_i), lib_i))
+    # to speed up later mip: don't consider small libs
+    # requires to make libs a dict instead of a list 
+    # else we lose identifiers and correspondence of IDs with original instance
+    """
+    # this code isn't ready for primetime, because we often use "lib.books for lib in libs" but that wouldn't work if libs is a dictionary
+    dedup_libs = dict([(lib.ide,lib) for lib in dedup_libs if len(lib.books) > nb_books_threshold])
+    if len(dedup_libs) != len(libs):
+        print("removed",len(libs)-len(dedup_libs),"libraries, now at",len(dedup_libs))
+    """
     return dedup_libs
 
 def smooth_books(libs,duplication_threshold=1):
@@ -95,7 +109,7 @@ books_in_lib = [len(lib.books) for lib in libs]
 print("books per lib before deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d" \
         %(mean(books_in_lib),median(books_in_lib),stdev(books_in_lib),max(books_in_lib),min(books_in_lib)))
 
-#libs = deduplicate_books(libs)
+libs = deduplicate_books(libs)
 #libs = smooth_books(libs)
 books_in_lib = [len(lib.books) for lib in libs]
 print("books per lib after deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d"% \
@@ -115,7 +129,7 @@ for lib in libs:
         payoff[(lib.ide,day)] = sum([b.score for b in lib.books_by_worth(
                 time_available=nb_days-day)])
  
-L = list(range(len(libs)))
+L = [lib.ide for lib in libs] # not always range(libs) if we deleted some before
 D = list(range(nb_days)) 
 
 do_mip = "--use_saved_mip" not in sys.argv
@@ -178,7 +192,7 @@ if do_mip:
 else:
     libs_selected=eval(open(prefix+"_knap3_mip_libs.txt").read().strip())
 
-print(len(libs_selected), 'selected libraries out of ', nb_libs)
+print(len(libs_selected), 'selected libraries out of ', len(libs))
 print(sum([libs[i].signup for (i,d) in libs_selected]), 'total signup time out of', nb_days,'days')
 
 sol_filename = "res_2020/" +  prefix + "_sol.txt" 

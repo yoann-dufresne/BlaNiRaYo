@@ -50,7 +50,7 @@ def solution_replace_lib(sol_libs, i, lib, nb_days, last_interval_index):
     new_sol = copy.copy(sol_libs) # gotta have a copy 
     new_sol[i] = copy.copy(lib)
     # update new signup_on times (everything may be shifted)
-    for j in range(i,len(sol_libs)):
+    for j in range(len(sol_libs)): # for some reason if I compute only from range(i,..) it messes up the solution!
         if j > 0:
             new_sol[j].signup_on = new_sol[j-1].signup_on + new_sol[j-1].signup 
         else:
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     tentatives = 0
     while True:
         # randomly replace k libraries by other ones
-        k=1 # k>1 isn't guaranteed to be bugfree and actually doesnt seem to be that effective
+        k=2 # k>1 isn't guaranteed to be bugfree and actually doesnt seem to be that effective
         # select an interval (start_index,start_index+k) within the solution
         start_index = random.randint(0,len(sol_libs)-k)
         # compute total signup time within that interval
