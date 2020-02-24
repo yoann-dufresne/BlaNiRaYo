@@ -7,6 +7,7 @@ from collections import Counter
 from src_2020.Parser import parse, problem_stats
 from src_2020.Parser import lib_sort_keys as sort_keys
 from src_2020.Outputer import output
+from src_2020.Dedup import deduplicate_books 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -23,10 +24,15 @@ if __name__ == "__main__":
     best_sol = []
     best_avoid = None
     best_attr = None
+    nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
+    #libs = deduplicate_books(libs) # doesn't seem so effective here
+
     for attr in attrs:
         sort_key = sort_keys[attr]
         for do_rev in [False, True]:
-            nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
+            for lib in libs: # reset the libs
+                lib.signed = False 
+                lib.books_to_scan = []
             time_available = nb_days
             libs_order = []
             avoid = set()

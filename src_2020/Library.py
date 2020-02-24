@@ -73,7 +73,7 @@ class Library:
 
     @property
     def testing(self):
-        return self.urgency / self.libworth**0.6   / len(self.books)**0.11
+        return self.urgency / (self.libworth+0.0001)**0.6   / (len(self.books)+0.0001)**0.11
 
 
     def add_books(self, books):

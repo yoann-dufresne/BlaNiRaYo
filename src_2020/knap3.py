@@ -18,16 +18,8 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
 
-from statistics import mean, stdev, median
-books_in_lib = [len(lib.books) for lib in libs]
-print("books per lib before deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d" \
-        %(mean(books_in_lib),median(books_in_lib),stdev(books_in_lib),max(books_in_lib),min(books_in_lib)))
-
 libs = deduplicate_books(libs)
 #libs = smooth_books(libs)
-books_in_lib = [len(lib.books) for lib in libs]
-print("books per lib after deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d"% \
-        (mean(books_in_lib),median(books_in_lib),stdev(books_in_lib),max(books_in_lib),min(books_in_lib)))
 
 booksc=Counter()
 for lib in libs:

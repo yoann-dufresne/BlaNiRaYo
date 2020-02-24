@@ -1,4 +1,4 @@
-def deduplicate_books(libs,duplication_threshold=3): 
+def deduplicate_books(libs,duplication_threshold=1): 
     #,nb_books_threshold=50): # not ready to do that kind of filtering, see below
     import heapq
     from copy import deepcopy
@@ -8,7 +8,12 @@ def deduplicate_books(libs,duplication_threshold=3):
     for lib in libs:
         for book in lib.books:
             booksc[book.ide] += 1
-    print("average frequency of a book",sum([booksc[b] for b in books]) / len(books))
+    print("average frequency of a book",sum([booksc[b] for b in booksc]) / len(booksc))
+    from statistics import mean, stdev, median
+    books_in_lib = [len(lib.books) for lib in libs]
+    print("books per lib before deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d" \
+        %(mean(books_in_lib),median(books_in_lib),stdev(books_in_lib),max(books_in_lib),min(books_in_lib)))
+
     libq = []
     # use a pq to control how imbalance when removing books from libraries,
     # possible strategies:
@@ -19,8 +24,8 @@ def deduplicate_books(libs,duplication_threshold=3):
     #selection_function = lambda lib_i: lib_i
     #selection_function = lambda lib_i: len(dedup_libs[lib_i].books)/(lib_i+1)
     #selection_function = lambda lib_i: -sum([book.score for book in dedup_libs[lib_i].books])
-    #selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
-    selection_function = lambda lib_i: dedup_libs[lib_i].urgency # huh? minor or not minus it doesn't matter?!
+    selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
+    #selection_function = lambda lib_i: -dedup_libs[lib_i].urgency # huh? minor or not minus it doesn't matter?!
     #selection_function = lambda lib_i: -dedup_libs[lib_i].urginvworth
     for lib_i,lib in enumerate(dedup_libs):
         heapq.heappush(libq, (selection_function(lib_i), lib_i))
@@ -49,6 +54,11 @@ def deduplicate_books(libs,duplication_threshold=3):
     if len(dedup_libs) != len(libs):
         print("removed",len(libs)-len(dedup_libs),"libraries, now at",len(dedup_libs))
     """
+
+    books_in_lib = [len(lib.books) for lib in dedup_libs]
+    print("books per lib after deduplication, mean %.2f / median %d / stdev %.2f / max %d / min %d"% \
+        (mean(books_in_lib),median(books_in_lib),stdev(books_in_lib),max(books_in_lib),min(books_in_lib)))
+
     return dedup_libs
 
 # not ready for primetime
