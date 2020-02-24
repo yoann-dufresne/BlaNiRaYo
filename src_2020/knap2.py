@@ -2,6 +2,7 @@ from src_2020.Parser import parse
 from src_2020.Outputer import output
 from src_2020.Scorer import scorer
 from src_2020.Library import mask_books
+from src_2020.Dedup import deduplicate_books 
 import sys
 
 if len(sys.argv) < 2:
@@ -9,6 +10,8 @@ if len(sys.argv) < 2:
 
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
+
+#libs = deduplicate_books(libs)
 
 do_mip = "--use_saved_mip" not in sys.argv
 if do_mip:
@@ -28,7 +31,7 @@ if do_mip:
 
     #m.objective = maximize(xsum(p[i] * x[i] for i in I))
     m.objective = maximize(xsum(scores[i] * b[i] for i in B))
-    #m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 1000*xsum(-libs[i].signup * l[i] for i in L))
+    #m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 0.5*xsum(-libs[i].signup * l[i] for i in L)) # the small tweak that gives 5.690 in instance c
 
     m += xsum(w[i] * l[i] for i in L) <= nb_days
 
