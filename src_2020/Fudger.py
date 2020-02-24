@@ -80,7 +80,7 @@ if __name__ == "__main__":
     tentatives = 0
     while True:
         # randomly replace k libraries by other ones
-        k=2 # k>1 isn't guaranteed to be bugfree and actually doesnt seem to be that effective
+        k=1 # k>1 isn't guaranteed to be bugfree and actually doesnt seem to be that effective
         # select an interval (start_index,start_index+k) within the solution
         start_index = random.randint(0,len(sol_libs)-k)
         # compute total signup time within that interval

@@ -69,7 +69,7 @@ class Library:
 
     @property
     def urginvworth(self):
-        return self.urgency / self.libworth**0.6
+        return self.urgency / (self.libworth+0.0001)**0.6 # 0.0001 is here to avoid divisions by zero
 
     @property
     def testing(self):

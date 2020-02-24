@@ -2,4 +2,16 @@ main.py: unused example for parser
 
 knap.py: first knapsack implementation with straightforward MIP
 knap2.py: with Yoann's idea to optimize over books scores instead of libraries potential (<-The one we ended up using)
-knap_e.py: post-hoc version to optimize instance e
+knap_e.py: post-hoc version to optimize instance e, never lead anywhere
+knap3.py: post-hoc version to optimize instance e, gave good results
+
+
+best score for f:
+knap2.py
+
+best score for e:
+knap3.pe
+
+rest: urgency.py I think
+
+

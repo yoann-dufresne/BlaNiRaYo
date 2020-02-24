@@ -17,7 +17,8 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
 
-def deduplicate_books(libs,duplication_threshold=1): 
+# TODO put this in a separate file
+def deduplicate_books(libs,duplication_threshold=3): 
     #,nb_books_threshold=50): # not ready to do that kind of filtering, see below
     import heapq
     from copy import deepcopy
@@ -39,7 +40,8 @@ def deduplicate_books(libs,duplication_threshold=1):
     #selection_function = lambda lib_i: len(dedup_libs[lib_i].books)/(lib_i+1)
     #selection_function = lambda lib_i: -sum([book.score for book in dedup_libs[lib_i].books])
     #selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
-    selection_function = lambda lib_i: -dedup_libs[lib_i].urgency
+    selection_function = lambda lib_i: dedup_libs[lib_i].urgency # huh? minor or not minus it doesn't matter?!
+    #selection_function = lambda lib_i: -dedup_libs[lib_i].urginvworth
     for lib_i,lib in enumerate(dedup_libs):
         heapq.heappush(libq, (selection_function(lib_i), lib_i))
     while len(booksc) > 0:
