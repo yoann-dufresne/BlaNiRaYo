@@ -24,9 +24,10 @@ def deduplicate_books(libs,duplication_threshold=1):
     #selection_function = lambda lib_i: lib_i
     #selection_function = lambda lib_i: len(dedup_libs[lib_i].books)/(lib_i+1)
     #selection_function = lambda lib_i: -sum([book.score for book in dedup_libs[lib_i].books])
-    selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
-    #selection_function = lambda lib_i: -dedup_libs[lib_i].urgency # huh? minor or not minus it doesn't matter?!
+    #selection_function = lambda lib_i: -len(dedup_libs[lib_i].books) / dedup_libs[lib_i].ship
+    selection_function = lambda lib_i: -dedup_libs[lib_i].urgency # best setting for knap3/e dataset. but huh, minus sign doesn't change anything?
     #selection_function = lambda lib_i: -dedup_libs[lib_i].urginvworth
+    #selection_function = lambda lib_i: -dedup_libs[lib_i].testing
     for lib_i,lib in enumerate(dedup_libs):
         heapq.heappush(libq, (selection_function(lib_i), lib_i))
     while len(booksc) > 0:
