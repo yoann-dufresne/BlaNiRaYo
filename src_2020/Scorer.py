@@ -37,7 +37,7 @@ def scorer(input_file, solution_file):
     total_score = 0
     for book in all_books:
         total_score += scores[book]
-    print("total score",total_score)
+    print("total score \033[1m",total_score,'\033[0m')
     return total_score
 
 

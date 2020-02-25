@@ -7,11 +7,13 @@ knap3.py: post-hoc version to optimize instance e, gave good results
 
 
 best score for f:
-knap2.py
+knap2.py 
+(with uncommented tweaks)
 
 best score for e:
-knap3.pe
+knap3.py
 
-rest: urgency.py I think
+rest: 
+urgency.py
 
 

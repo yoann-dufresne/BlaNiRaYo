@@ -74,7 +74,6 @@ def execute(metric):
         if nb_libs < 10000 or iteration % 50 == 1:
             update_lib_queue()
         iteration += 1
-        #print(len(lib_q))
         value, max_lib = heapq.heappop(lib_q)
         libs_sol.append(max_lib)
         # Selection livres
