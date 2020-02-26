@@ -74,7 +74,9 @@ if __name__ == "__main__":
     #####################################################
     nb_books, nb_libs, nb_days, scores, all_libs, books = parse(problem_file)
     # Minimum number of library groups we want to separate
+    # TODO: Optimize this
     # min_nb_groups = 10
+    # min_nb_groups = 10 * nb_days // lib_stats["daysneed"]
     min_nb_groups = nb_days // lib_stats["daysneed"]
     libgraph = build_libgraph(all_libs)
     lib_dists = np.fromiter(
@@ -92,7 +94,7 @@ if __name__ == "__main__":
         if len(lib_sets) > min_nb_groups:
             break
     print(f"Partitioned the libraries into", len(lib_sets), "sets")
-    libs = list(map(get_best_lib, lib_sets))
+    # libs = list(map(get_best_lib, lib_sets))
     ############################
     # Order selected libraries #
     ############################
@@ -100,57 +102,68 @@ if __name__ == "__main__":
     best_sol = []
     best_avoid = None
     best_attr = None
-    for attr in attrs:
-        sort_key = sort_keys[attr]
-        for do_rev in [False, True]:
-            for lib in libs:  # reset the libs
-                lib.signed = False
-                lib.books_to_scan = []
-            time_available = nb_days
-            libs_order = []
-            avoid = set()
-            for lib in sorted(libs, key=sort_key, reverse=do_rev):
-                books_to_scan = lib.books_by_worth(
-                    time_available=time_available,
-                    avoid=avoid)
-                if books_to_scan:
-                    lib.books_to_scan.extend(books_to_scan)
-                    lib.signed = True
-                    avoid |= set(books_to_scan)
-                    libs_order.append(lib)
-                    time_available -= lib.signup
-                    if time_available <= 0:
-                        break
-            if time_available:
-                # TODO: improve this to select missing worthy books
-                # Try to add some libraries from (all_libs - libs_order) with low urgency
-                for lib in sorted(set(all_libs) - set(libs_order), key=get_urgency):
-                    books_to_scan = lib.books_by_worth(
-                        time_available=time_available,
-                        avoid=avoid)
-                    if books_to_scan:
-                        lib.books_to_scan.extend(books_to_scan)
-                        lib.signed = True
-                        avoid |= set(books_to_scan)
-                        libs_order.append(lib)
-                        time_available -= lib.signup
-                        if time_available <= 0:
-                            break
-            this_score = sum(b.score for b in avoid)
-            if do_rev:
-                print(f"Solution rev sorting on {attr:15}: {this_score:>10}")
+    best_selection = None
+    for selecter_attr in attrs:
+        selecter = sort_keys[selecter_attr]
+        for do_rev1 in [False, True]:
+            if do_rev1:
+                selection_name = f"rev_{selecter_attr}"
             else:
-                print(f"Solution fwd sorting on {attr:15}: {this_score:>10}")
-            if this_score > best_score:
-                best_score = this_score
-                best_sol = deepcopy(libs_order)
-                best_avoid = avoid
-                if do_rev:
-                    best_attr = f"rev_{attr}"
-                else:
-                    best_attr = f"fwd_{attr}"
+                selection_name = f"fwd_{selecter_attr}"
+            print(f"Selecting best libs on {selection_name}")
+            libs = [get_best_lib(lib_set, sort_key=selecter, do_rev=do_rev1) for lib_set in lib_sets]
+            for attr in attrs:
+                sort_key = sort_keys[attr]
+                for do_rev in [False, True]:
+                    for lib in libs:  # reset the libs
+                        lib.signed = False
+                        lib.books_to_scan = []
+                    time_available = nb_days
+                    libs_order = []
+                    avoid = set()
+                    for lib in sorted(libs, key=sort_key, reverse=do_rev):
+                        books_to_scan = lib.books_by_worth(
+                            time_available=time_available,
+                            avoid=avoid)
+                        if books_to_scan:
+                            lib.books_to_scan.extend(books_to_scan)
+                            lib.signed = True
+                            avoid |= set(books_to_scan)
+                            libs_order.append(lib)
+                            time_available -= lib.signup
+                            if time_available <= 0:
+                                break
+                    if time_available:
+                        # TODO: improve this to select missing worthy books
+                        # Try to add some libraries from (all_libs - libs_order) with low urgency
+                        for lib in sorted(set(all_libs) - set(libs_order), key=sort_key, reverse=do_rev):
+                            books_to_scan = lib.books_by_worth(
+                                time_available=time_available,
+                                avoid=avoid)
+                            if books_to_scan:
+                                lib.books_to_scan.extend(books_to_scan)
+                                lib.signed = True
+                                avoid |= set(books_to_scan)
+                                libs_order.append(lib)
+                                time_available -= lib.signup
+                                if time_available <= 0:
+                                    break
+                    this_score = sum(b.score for b in avoid)
+                    if do_rev:
+                        print(f"Solution rev sorting on {attr:15}: {this_score:>10}")
+                    else:
+                        print(f"Solution fwd sorting on {attr:15}: {this_score:>10}")
+                    if this_score > best_score:
+                        best_selection = selection_name
+                        best_score = this_score
+                        best_sol = deepcopy(libs_order)
+                        best_avoid = avoid
+                        if do_rev:
+                            best_attr = f"rev_{attr}"
+                        else:
+                            best_attr = f"fwd_{attr}"
     max_score = sum(b.score for b in books.values())
-    print(f"\nBest solution found sorting on {best_attr}")
+    print(f"\nBest solution found selecting on {selection_name} and sorting on {best_attr}")
     print(f"  Score: {best_score} / {max_score}")
     print(f"  Number of books scanned: {len(best_avoid)} / {nb_books}")
     print(f"  Number of libraries used: {len(best_sol)} / {nb_libs}")
