@@ -1,5 +1,3 @@
-from operator import attrgetter
-from collections import Counter
 
 class Book:
 
@@ -8,132 +6,54 @@ class Book:
         self.score = score
         self.frq = 0
 
-    @property
-    def weighted_score(self):
-        return self.score / self.frq
+    def __lt__(self, other):
+        return self.score > other.score
 
-    @property
-    def weighted_score2(self):
-        return self.score * self.frq
-
-
-    @property
-    def get_score(self):
-        return self.score
-
-    @property
-    def inv_frq(self):
-        return 1 / self.frq
-
+    def __repr__(self):
+        return f"{self.ide}({self.score})"
 
 def mask_books(books, avoid):
     return [b for b in books if b not in avoid]
-    # for book in books:
-    #     if book not in avoid:
-    #         yield book
 
 
 class Library:
 
-    def __init__(self, ide, signup, ship):
+    def __init__(self, ide, signup, ship, all_books):
         self.ide = ide
         # signup delay
         self.signup = signup
         # book "bandwidth"
         self.ship = ship
         # List of books
-        self.books = []
+        self._books = all_books
+        self.present_books = [False]* len(all_books)
         # List of books to scan /!\ ORDER IS IMPORTANT
         self.books_to_scan = []
 
-    def __lt__(self, other):
-        return len(self.books) < len(other.books)
+    def __repr__(self):
+        return str(self.ide)
+
+    # def __lt__(self, other):
+    #     return len(self.books) < len(other.books)
 
     def add_books(self, books):
-        self.books.extend(books)
+        for b in books:
+            self.present_books[b.ide] = True
 
-    def add_books_to_scan(self, books):
+    def books(self, avoid=set()):
+        for idx, present in enumerate(self.present_books):
+            if present and self._books[idx] not in avoid:
+                yield self._books[idx]
+
+    def sorted_books(self, avoid=set(), nb_days=-1):
+        if nb_days < 0:
+            return sorted(self.books(avoid))
+        else:
+            return sorted(self.books(avoid))[:nb_days*self.ship]
+
+    def days_to_complete(self, avoid=set()):
+        return self.signup + len(list(self.books(avoid))) / self.ship
+
+    def queue_books_to_scan(self, books):
         self.books_to_scan.extend(books)
-
-    def worthy_books_first(self):
-        return sorted(self.books, key=attrgetter("weighted_score"), reverse=True)
-
-    def worthy_books_first2(self):
-        return sorted(self.books, key=attrgetter("inv_frq"), reverse=True)
-    
-    def worthy_books_first3(self):
-        return sorted(self.books, key=attrgetter("get_score"), reverse=True)
-    
-    def worthy_books_first4(self):
-        return sorted(self.books, key=attrgetter("weighted_score2"), reverse=True)
-
-    def nb_books_scannable(self, time_avail):
-        time_bookflow = time_avail - self.signup
-        return time_bookflow * self.ship
-
-    def interest1(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-        return sum(b.weighted_score for b in mask_books(self.worthy_books_first(), avoid)[:nb_books_scannable])
-
-    def interest2(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-
-        return sum(b.score for b in mask_books(self.worthy_books_first4(), avoid)[:nb_books_scannable])
-
-    def interest3(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-
-        return sum(1/b.frq for b in mask_books(self.worthy_books_first2(), avoid)[:nb_books_scannable])
-
-    def interest4(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-
-        return sum(b.score / b.frq for b in mask_books(self.worthy_books_first(), avoid)[:nb_books_scannable])
-
-    def interest5(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-
-        return sum(b.frq for b in mask_books(self.worthy_books_first2(), avoid)[:nb_books_scannable])
-
-    def interest6(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-
-        return sum(b.frq for b in mask_books(self.worthy_books_first2(), avoid)[:nb_books_scannable]) /(self.signup*self.ship)
-
-    def interest7(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-        return sum(b.frq for b in mask_books(self.worthy_books_first2(), avoid)[:max(1,(nb_books_scannable*4)//5)]) /(self.signup*self.ship)
- 
-    def interest8(self, time_avail, avoid=set()):
-        """A potential heuristic measure of library potential interest."""
-        # time_bookflow = time_avail - self.signup
-        # nb_books_scannable = time_bookflow // self.ship
-        nb_books_scannable = self.nb_books_scannable(time_avail)
-        return (1/nb_books_scannable*1/self.signup**2*self.ship)
- 
-
-
-
-
 
