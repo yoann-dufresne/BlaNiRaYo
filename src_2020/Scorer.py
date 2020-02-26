@@ -8,7 +8,7 @@ def scorer(input_file, solution_file):
     # assumption: libs are in the order they'll output books
     day = 0
     all_lines = open(solution_file).read().split('\n')
-    est_nb_libs = len(all_lines)-1 // 2
+    est_nb_libs = (len(all_lines)-1) // 2
     for i, line in enumerate(all_lines):
         if len(line.strip()) == 0: break
         if i == 0:

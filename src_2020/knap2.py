@@ -32,20 +32,21 @@ if do_mip:
     # this is to add some weight to the total signup time in the MIP
     f_factor = 0
     if prefix == "f":
-        f_factor = 4000
-    #f_factor = int(sys.argv[2]) #hack, use it like this: for i in `seq 1 2 40` ;do python knap2.py ../data/f_libraries_of_the_world.txt $i; done
+        f_factor = 4000 # the small tweak that gives 5.204 in instance f (with urgency greedy)
+    elif prefix == "c":
+        f_factor = 0.5  # the small tweak that gives 5.690 in instance c
+    #f_factor = float(sys.argv[2]) #hack, use it like this: for i in `seq 1 2 40` ;do python knap2.py ../data/f_libraries_of_the_world.txt $i; done
     if f_factor != 0:
         print("f_factor",f_factor)
 
     #m.objective = maximize(xsum(p[i] * x[i] for i in I))
     #m.objective = maximize(xsum(scores[i] * b[i] for i in B))
-    #m.objective = maximize(xsum(scores[i] * b[i] for i in B) + 0.5*xsum(-libs[i].signup * l[i] for i in L)) # the small tweak that gives 5.690 in instance c
-    m.objective = maximize(xsum(scores[i] * b[i] for i in B) + f_factor*xsum(-libs[i].signup * l[i] for i in L)) # the small tweak that gives 5.204 in instance f (with urgency greedy)
+    m.objective = maximize(xsum(scores[i] * b[i] for i in B) + f_factor*xsum(-libs[i].signup * l[i] for i in L)) 
 
     adjust_nb_days = 0
     if prefix == "f":
         adjust_nb_days = 30 # make instance f think it has slightly less days
-    adjust_nb_days = int(sys.argv[2]) #hack, use it like this: for i in `seq 1 2 40` ;do python knap2.py ../data/f_libraries_of_the_world.txt $i ; done
+    #adjust_nb_days = int(sys.argv[2]) #hack, use it like this: for i in `seq 1 2 40` ;do python knap2.py ../data/f_libraries_of_the_world.txt $i ; done
     if adjust_nb_days != 0:
         print("adjusted nb_days:",-adjust_nb_days)
 
