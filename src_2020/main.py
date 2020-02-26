@@ -60,6 +60,7 @@ def mip_select_libs(books, libs, max_time):
 
 from itertools import combinations, permutations
 from src_2020.Solution import Solution
+import random
 
 def compute_sol(libs, nb_days):
     total_register_time = sum(lib.signup for lib in libs)
@@ -67,8 +68,10 @@ def compute_sol(libs, nb_days):
     best_score = 0
 
     lib_set = set(libs)
+    combs = list(combinations(libs, 6))
+    random.shuffle(combs)
 
-    for comb in combinations(libs, 6):
+    for comb in combs:
         # initial solution
         # Add the permutations
         for perm in permutations(comb, len(comb)):
