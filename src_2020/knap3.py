@@ -28,6 +28,7 @@ for lib in libs:
 print("sanity check: average frequency of a book",sum([booksc[b] for b in books]) / len(books)) 
 
 # now that all books are distinct, we can calculate exactly the payoff of a library if chosen at a certain timepoint
+# ACTUALLY: its not 'exactly' as some libraries share the same books :/
 payoff = dict()
 for lib in libs:
     for day in range(nb_days):
@@ -61,7 +62,7 @@ if do_mip:
 
     # under constraint that selected libs have a signup time
     m += xsum(w[i] * l[(i,d)] for i in L for d in D) <= nb_days
-    # i suspect this constraint is redundant
+    # I suspect this constraint is redundant
 
     # lib can be signed up only once
     for i in L:

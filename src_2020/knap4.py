@@ -138,7 +138,9 @@ for d in D:
         books_to_scan = [b for b in libs[i].books if b.ide in list_lib_books]
         time_available = nb_days-d-libs[i].signup
         if time_available <= 0 : continue
-        books_to_scan = sorted(books_to_scan, key=lambda b:b.score)[::-1][:time_available*libs[i].ship]
+        if len(book_to_scan) > time_available*libs[i].ship:
+            print("lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(book_to_scan), time_available*libs[i].ship)
+        books_to_scan = sorted(books_to_scan, key=lambda b:b.score)[::-1][:time_available*libs[i].ship] 
         if len(books_to_scan) < time_available*libs[i].ship:
             print("lib",i,"had time to scan",time_available*libs[i].ship-len(books_to_scan),"more books but only did",len(books_to_scan))
         libs[i].books_to_scan = books_to_scan
