@@ -97,8 +97,6 @@ if do_mip:
     for i in L:
         m += xsum(bl[(b,i)] for b in B if (b,i) in book_lib_set) <= xsum((nb_days-d-libs[i].signup)*libs[i].ship * l[(i,d)] for d in D)
 
-    # TODO validate it and test it!!
-
     if debug: print("done with all constraints!")
 
     #m.optimize(max_seconds=60)
