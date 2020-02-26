@@ -30,8 +30,8 @@ if __name__ == "__main__":
     for attr in attrs:
         sort_key = sort_keys[attr]
         for do_rev in [False, True]:
-            for lib in libs: # reset the libs
-                lib.signed = False 
+            for lib in libs:  # reset the libs
+                lib.signed = False
                 lib.books_to_scan = []
             time_available = nb_days
             libs_order = []

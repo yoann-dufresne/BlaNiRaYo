@@ -1,6 +1,7 @@
 import sys
 from collections import Counter
 from operator import attrgetter
+from numpy import fromiter
 from src_2020.Library import Library, Book
 
 def parse(source=None):
@@ -35,13 +36,14 @@ def parse(source=None):
     return nb_books, nb_libs, nb_days, scores, libs, books
 
 
-lib_sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth","testing"]
+lib_sort_attrs = ["ship", "signup", "urgency", "libsize", "libworth", "daysneed", "urginvworth", "testing"]
 lib_sort_keys = {
     attr: attrgetter(attr)
     for attr in lib_sort_attrs}
 
 
 def problem_stats(problem_file):
+    lib_stats = {}
     nb_books, nb_libs, nb_days, scores, libs, books = parse(problem_file)
     time_available = nb_days
     scores_counter = Counter(scores)
@@ -59,3 +61,5 @@ def problem_stats(problem_file):
         else:
             info = f"{min(counters[attr].keys())} -> {max(counters[attr].keys())}"
         print(f"  Number of distinct values for {attr}: {len(counters[attr])} ({info})")
+        lib_stats[attr] = fromiter(map(lib_sort_keys[attr], libs), dtype=float).mean()
+    return lib_stats
