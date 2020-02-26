@@ -28,7 +28,6 @@ for lib in libs:
 print("sanity check: average frequency of a book",sum([booksc[b] for b in books]) / len(books)) 
 
 # now that all books are distinct, we can calculate exactly the payoff of a library if chosen at a certain timepoint
-# ACTUALLY: its not 'exactly' as some libraries share the same books :/
 payoff = dict()
 for lib in libs:
     for day in range(nb_days):
