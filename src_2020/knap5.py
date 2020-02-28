@@ -20,9 +20,13 @@ L = list(range(len(libs)))
 D = list(range(nb_days)) 
 B = list(range(nb_books))
 
+NB_UNORDERED_DAYS = 120
+UNORDERED_DAYS = list(range(nb_days-NB_UNORDERED_DAYS))
+LAST_DAYS = list(range(nb_days-NB_UNORDERED_DAYS,nb_days))
+
 do_mip = "--use_saved_mip" not in sys.argv
 if do_mip:
-    from mip import Model, xsum, maximize, BINARY
+    from mip import Model, xsum, maximize, BINARY, INTEGER
 
     w = [libs[i].signup for i in L]
 
@@ -35,22 +39,18 @@ if do_mip:
 
     print("number of book-lib relationships (out of %d possible): %d" % (nb_books*nb_libs, len(book_lib_set)))
 
-    m = Model('knap solver 4')
+    m = Model('knap solver 5')
     #m.verbose=0
-
-    debug = True
-    if debug: print("bl constraints..")
 
     bl = dict()
     # which book is taken by which lib
-    # some sort of bipartite max matching
-    # this is what differs from knap3
     for (book, lib) in book_lib_set:
         bl[(book,lib)] = m.add_var(var_type=BINARY)
 
-    # the objective function also differs from knap3
-    # no more payoff estimation bs, we optimize directly the real score now!
     m.objective = maximize(xsum(scores[b] * bl[(b,l)] for (b,l) in book_lib_set))
+
+    debug = True
+    if debug: print("bl constraints..")
 
     # book can be assigned to a single library
     for b in B:
@@ -58,44 +58,63 @@ if do_mip:
 
     if debug: print("LxD constraints..")
 
+    # difference from knap4:
+    # we split in two now
+    # one part are the libs for which order isn't necessary (the starting ~10-15 libs in the solution)
+    # the other part are the libs for which we won't select all their books (the handful of end libs in the solution)
+
     l = dict()
     o = dict() # occuped by signup
     for i in L:
-        for d in D:
+        for d in LAST_DAYS: # this is a difference with knap4: only optimize the last days
             l[(i,d)] = m.add_var(var_type=BINARY)
             o[(i,d)] = m.add_var(var_type=BINARY)
+            
+    # the unordered libraries
+    ul = [m.add_var(var_type=BINARY) for i in L]
+
+    # assign the number of unordered days
+    real_nb_unordered_days = m.add_var(var_type=INTEGER)
+    m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L) 
+    
+    # make sure all l[]'s are after the number of unordered days
+    for i in L:
+        #m += xsum(l[(i,d)]*d for d in LAST_DAYS) - real_nb_unordered_days -1 >= 0
+        # yeah so that doesn't work, what if l[i,d] is zero for all d's! (i.e. lib not picked)
+        pass
 
     # total signup time is respected
-    m += xsum(w[i] * l[(i,d)] for i in L for d in D) <= nb_days
-    # this is likely a redundant constraint
+    m += xsum(w[i] * l[(i,d)] for i in L for d in LAST_DAYS) + xsum(w[i] * ul[i] for i in L) <= nb_days
 
     # lib can be signed up only once
     for i in L:
-        m += xsum(l[(i,d)] for d in D) <= 1
+        m += xsum(l[(i,d)] for d in LAST_DAYS) + ul[i] <= 1
 
     if debug: print("LxDxsignup constraints..")
 
     # if a lib is signed up at a certain time, we're occupied during the next days
     for i in L:
         if i % 100 == 0: print(i)
-        for d in D:
+        for d in LAST_DAYS:
             for k in range(libs[i].signup):
                 if d+k >= nb_days: continue
                 m += l[(i,d)] <= o[(i,d+k)]
 
     # at each day, we can only be occupied by signing up a single library
-    for d in D:
+    for d in LAST_DAYS:
         m += xsum(o[(i,d)] for i in L) <= 1
 
-    if debug: print("final bl constraints..")
+    if debug: print("final bl constraints 1..")
 
     # can only take a book if the library has been signed up
     for b,i in book_lib_set:
-        m += bl[(b,i)] <= xsum(l[(i,d)] for d in D)
+        m += bl[(b,i)] <= xsum(l[(i,d)] for d in LAST_DAYS) + ul[i]
     
+    if debug: print("final bl constraints 2..")
+   
     # aaand finally, library can only take a certain number of books until the end
     for i in L:
-        m += xsum(bl[(b,i)] for b in B if (b,i) in book_lib_set) <= xsum((nb_days-d-libs[i].signup)*libs[i].ship * l[(i,d)] for d in D)
+        m += xsum(bl[(b,i)] for b in B if (b,i) in book_lib_set) <= xsum((nb_days-d-libs[i].signup)*libs[i].ship * l[(i,d)] for d in LAST_DAYS) + len(libs[i].books)*ul[i] # FIXME unsure of that one, what if ul[i] actually doesn't have time to finish?!
 
     if debug: print("done with all constraints!")
 
@@ -139,7 +158,7 @@ for d in D:
         time_available = nb_days-d-libs[i].signup
         if time_available <= 0 : continue
         if len(books_to_scan) > time_available*libs[i].ship:
-            print("lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship)
+            print("lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship))
             books_to_scan = sorted(books_to_scan, key=lambda b:b.score)[::-1][:time_available*libs[i].ship] 
         if len(books_to_scan) < time_available*libs[i].ship:
             print("lib",i,"had time to scan",time_available*libs[i].ship-len(books_to_scan),"more books but only did",len(books_to_scan))
