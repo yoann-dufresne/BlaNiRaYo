@@ -20,9 +20,9 @@ L = list(range(len(libs)))
 D = list(range(nb_days)) 
 B = list(range(nb_books))
 
-NB_UNORDERED_DAYS = 120
-UNORDERED_DAYS = list(range(nb_days-NB_UNORDERED_DAYS))
-LAST_DAYS = list(range(nb_days-NB_UNORDERED_DAYS,nb_days))
+NB_ORDERED_DAYS = 130
+UNORDERED_DAYS = list(range(nb_days-NB_ORDERED_DAYS))
+LAST_DAYS = list(range(nb_days-NB_ORDERED_DAYS,nb_days))
 
 do_mip = "--use_saved_mip" not in sys.argv
 if do_mip:
@@ -75,12 +75,17 @@ if do_mip:
 
     # assign the number of unordered days
     real_nb_unordered_days = m.add_var(var_type=INTEGER)
-    m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L) 
+    m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L)
+
+    m += real_nb_unordered_days <= nb_days #- NB_ORDERED_DAYS 
     
-    # make sure all l[]'s are after the number of unordered days
-    for i in L:
-        #m += xsum(l[(i,d)]*d for d in LAST_DAYS) - real_nb_unordered_days -1 >= 0
-        # yeah so that doesn't work, what if l[i,d] is zero for all d's! (i.e. lib not picked)
+    # make sure all l[]'s are set after the number of unordered days in ul's
+    # we do this the following way:
+    # artificially set o[0,d] to 1 if d <= real_nb_unordered_days
+    # and the way to do this if in the MIP is to reformulate it as:
+    # WIP
+    for d in LAST_DAYS:
+        #m += o[(0,d)]*(d-NB_ORDERED_DAYS) - real_nb_unordered_days - NB_ORDERED_DAYS -1 >= 0
         pass
 
     # total signup time is respected
@@ -146,30 +151,37 @@ else:
     olibs_selected=eval(open(prefix+"_knap5_mip_olibs.txt").read().strip())
     books_selected=eval(open(prefix+"_knap5_mip_books.txt").read().strip())
 
-print(len(libs_selected), 'MIP-selected libraries out of ', nb_libs)
-total_selected_signup = sum([libs[i].signup for (i,d) in libs_selected])
+print(len(ulibs_selected), 'MIP-selected unordered libraries out of ', nb_libs)
+print(len(olibs_selected), 'MIP-selected ordered libraries out of ', nb_libs)
+total_selected_signup = sum([libs[i].signup for (i,d) in olibs_selected] + [libs[i].signup for i in ulibs_selected])
 print(total_selected_signup, 'total signup time out of', nb_days,'days')
 print(len(books_selected), 'MIP-selected books out of ', nb_books)
 sol_filename = "res_2020/" +  prefix + "_sol.txt" 
 
 # retrieve the solution lib order
-selected_libs = ulibs_selected + map(lambda d,i: i, sorted((d,i) for (i,d) in olibs_selected))
+selected_libs = list(ulibs_selected) + list(map(lambda x: x[1], sorted((d,i) for (i,d) in olibs_selected)))
 
 libs_sol = []
 avoid = set()
 day = 0
 for i in selected_libs:
+        lib_status = "unordered" if i in ulibs_selected else "ordered"
         libs[i].signed = False
         list_lib_books = set([b for (b,j) in books_selected if j == i])
         books_to_scan = [b for b in libs[i].books if b.ide in list_lib_books]
         day += libs[i].signup
+        if lib_status == "ordered":
+            print("ordered lib",i,"actual day",day,"MIP-envisioned day",[d for j,d in olibs_selected if i == j][0])
         time_available = nb_days-day
         if time_available <= 0 : continue
         if len(books_to_scan) > time_available*libs[i].ship:
-            print("lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship))
+            print(lib_status,"lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship))
             books_to_scan = sorted(books_to_scan, key=lambda b:b.score)[::-1][:time_available*libs[i].ship] 
-        if len(books_to_scan) < time_available*libs[i].ship:
-            print("lib",i,"had time to scan",time_available*libs[i].ship-len(books_to_scan),"more books but only did",len(books_to_scan))
+        nb_unscanned_books = len(libs[i].books) - len(books_to_scan)
+        time_to_scan_books = len(books_to_scan) / libs[i].ship
+        nb_unscanned_books_in_time_available = min(nb_unscanned_books, time_available*libs[i].ship)
+        if  nb_unscanned_books > 0 and time_available > time_to_scan_books:
+            print(lib_status,"lib",i,"timespan",day-libs[i].signup,day,"had time to scan",nb_unscanned_books_in_time_available,"more books but only did",len(books_to_scan))
         libs[i].books_to_scan = books_to_scan
         libs_sol.append(libs[i])
         avoid |= set(books_to_scan)
