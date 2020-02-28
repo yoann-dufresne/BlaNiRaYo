@@ -125,21 +125,26 @@ if do_mip:
     #m.optimize(max_solutions=100,relax=True)
     m.optimize()
 
-    libs_selected = set([(i,d) for i in L for d in D if l[(i,d)].x >= 0.99])
+    ulibs_selected = set([i for i in L if ul[i].x >= 0.99])
+    olibs_selected = set([(i,d) for i in L for d in LAST_DAYS if l[(i,d)].x >= 0.99])
     books_selected = [(b,i) for (b,i) in book_lib_set if bl[(b,i)].x >= 0.99]
 
     save=True
     if save:
-        f=open(prefix+"_knap4_mip_libs.txt","w")
-        f.write(str(libs_selected))
+        f=open(prefix+"_knap5_mip_ulibs.txt","w")
+        f.write(str(ulibs_selected))
         f.close()
-        f=open(prefix+"_knap4_mip_books.txt","w")
+        f=open(prefix+"_knap5_mip_olibs.txt","w")
+        f.write(str(olibs_selected))
+        f.close()
+        f=open(prefix+"_knap5_mip_books.txt","w")
         f.write(str(books_selected))
         f.close()
 
 else:
-    libs_selected=eval(open(prefix+"_knap4_mip_libs.txt").read().strip())
-    books_selected=eval(open(prefix+"_knap4_mip_books.txt").read().strip())
+    ulibs_selected=eval(open(prefix+"_knap5_mip_ulibs.txt").read().strip())
+    olibs_selected=eval(open(prefix+"_knap5_mip_olibs.txt").read().strip())
+    books_selected=eval(open(prefix+"_knap5_mip_books.txt").read().strip())
 
 print(len(libs_selected), 'MIP-selected libraries out of ', nb_libs)
 total_selected_signup = sum([libs[i].signup for (i,d) in libs_selected])
@@ -147,15 +152,18 @@ print(total_selected_signup, 'total signup time out of', nb_days,'days')
 print(len(books_selected), 'MIP-selected books out of ', nb_books)
 sol_filename = "res_2020/" +  prefix + "_sol.txt" 
 
+# retrieve the solution lib order
+selected_libs = ulibs_selected + map(lambda d,i: i, sorted((d,i) for (i,d) in olibs_selected))
+
 libs_sol = []
 avoid = set()
-for d in D:
-    for i in L:
-        if (i,d) not in libs_selected: continue
+day = 0
+for i in selected_libs:
         libs[i].signed = False
         list_lib_books = set([b for (b,j) in books_selected if j == i])
         books_to_scan = [b for b in libs[i].books if b.ide in list_lib_books]
-        time_available = nb_days-d-libs[i].signup
+        day += libs[i].signup
+        time_available = nb_days-day
         if time_available <= 0 : continue
         if len(books_to_scan) > time_available*libs[i].ship:
             print("lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship))
