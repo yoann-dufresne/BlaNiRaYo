@@ -54,7 +54,7 @@ if do_mip:
 
     # book can be assigned to a single library
     for b in B:
-        m += xsum(bl[(b,i)] for i in L if (b,i) in book_lib_set) <= 1 
+        m += xsum(bl[(b,i)] for i in book_lib_dict[b]) <= 1 
 
     if debug: print("LxD constraints..")
 
@@ -126,7 +126,7 @@ if do_mip:
    
     # aaand finally, library can only take a certain number of books until the end
     for i in L:
-        m += xsum(bl[(b,i)] for b in B if (b,i) in book_lib_set) <= xsum((nb_days-d-libs[i].signup)*libs[i].ship * l[(i,d)] for d in LAST_DAYS) + len(libs[i].books)*ul[i] # FIXME unsure of that one, what if ul[i] actually doesn't have time to finish?!
+        m += xsum(bl[(b.ide,i)] for b in libs[i].books) <= xsum((nb_days-d-libs[i].signup)*libs[i].ship * l[(i,d)] for d in LAST_DAYS) + len(libs[i].books)*ul[i] # FIXME unsure of that one, what if ul[i] actually doesn't have time to finish?!
 
     if debug: print("done with all constraints!")
 
@@ -171,24 +171,44 @@ selected_libs = list(ulibs_selected) + list(map(lambda x: x[1], sorted((d,i) for
 libs_sol = []
 avoid = set()
 day = 0
+
+scanned_books_lib = defaultdict(list)
+for b,i in books_selected:
+    scanned_books_lib[b] += [i]
+
 for i in selected_libs:
         lib_status = "unordered" if i in ulibs_selected else "ordered"
         libs[i].signed = False
         list_lib_books = set([b for (b,j) in books_selected if j == i])
         books_to_scan = [b for b in libs[i].books if b.ide in list_lib_books]
-        day += libs[i].signup
         if lib_status == "ordered":
-            print("ordered lib",i,"actual day",day,"MIP-envisioned day",[d for j,d in olibs_selected if i == j][0])
+            envisioned_day = [d for j,d in olibs_selected if i == j][0]
+            if day != envisioned_day:
+                print("ordered lib",i,"actual day",day,"MIP-envisioned day",envisioned_day)
+        day += libs[i].signup
         time_available = nb_days-day
         if time_available <= 0 : continue
         if len(books_to_scan) > time_available*libs[i].ship:
             print(lib_status,"lib",i,"has assigned more books %d to scan than available time (%d), cutting them" % (len(books_to_scan), time_available*libs[i].ship))
             books_to_scan = sorted(books_to_scan, key=lambda b:b.score)[::-1][:time_available*libs[i].ship] 
-        nb_unscanned_books = len(libs[i].books) - len(books_to_scan)
+        unscanned_books = set(libs[i].books) - set(books_to_scan)
+        # determine cases where unselected books are actually scanned by another lib
+        for b in list(unscanned_books):
+            if b.ide in scanned_books_lib:
+                #print("book",b.ide,"unscanned by lib",i,"is actually scanned by lib",scanned_books_lib[b.ide])
+                unscanned_books -= set([b])
+        nb_unscanned_books = len(unscanned_books)
         time_to_scan_books = len(books_to_scan) / libs[i].ship
         nb_unscanned_books_in_time_available = min(nb_unscanned_books, time_available*libs[i].ship)
         if  nb_unscanned_books > 0 and time_available > time_to_scan_books:
             print(lib_status,"lib",i,"timespan",day-libs[i].signup,day,"had time to scan",nb_unscanned_books_in_time_available,"more books but only did",len(books_to_scan))
+            rescue_pile = []
+            for b in unscanned_books:
+                rescue_pile += [b]
+            rescue_pile = rescue_pile[:nb_unscanned_books_in_time_available]
+            books_to_scan += rescue_pile
+            print("rescued",len(rescue_pile),"books (that should not have happened if MIP was correct)")
+
         libs[i].books_to_scan = books_to_scan
         libs_sol.append(libs[i])
         avoid |= set(books_to_scan)
