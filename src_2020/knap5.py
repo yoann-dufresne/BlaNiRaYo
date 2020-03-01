@@ -20,7 +20,7 @@ L = list(range(len(libs)))
 D = list(range(nb_days)) 
 B = list(range(nb_books))
 
-NB_ORDERED_DAYS = 130
+NB_ORDERED_DAYS = 100
 UNORDERED_DAYS = list(range(nb_days-NB_ORDERED_DAYS))
 LAST_DAYS = list(range(nb_days-NB_ORDERED_DAYS,nb_days))
 
@@ -77,16 +77,23 @@ if do_mip:
     real_nb_unordered_days = m.add_var(var_type=INTEGER)
     m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L)
 
-    m += real_nb_unordered_days <= nb_days #- NB_ORDERED_DAYS 
+    m += real_nb_unordered_days <= nb_days - 90 #  eyeballed time of the longest unordered library.. (can be further tuned)
     
     # make sure all l[]'s are set after the number of unordered days in ul's
     # we do this the following way:
     # artificially set o[0,d] to 1 if d <= real_nb_unordered_days
     # and the way to do this if in the MIP is to reformulate it as:
-    # WIP
+    # o[(0,d)] * large_number >= day_difference where day is one of:
+    # 
+    # -----------------|--------|################ <- those
+    #                  start of ordered days
+    #                           |
+    # xxxxxxxxxxxxxxxxxxxxxxxxxx| where the read_unordered_days end
+    # and the trick is day_difference is > 0 if we're after the real_unordered_days and <= 0 otherwise 
+    # which forces o[(0,d]) to be 1 when it's day_difference>0
     for d in LAST_DAYS:
-        #m += o[(0,d)]*(d-NB_ORDERED_DAYS) - real_nb_unordered_days - NB_ORDERED_DAYS -1 >= 0
-        pass
+        m += o[(0,d)]*nb_days - (real_nb_unordered_days - d) >= 0
+        #pass
 
     # total signup time is respected
     m += xsum(w[i] * l[(i,d)] for i in L for d in LAST_DAYS) + xsum(w[i] * ul[i] for i in L) <= nb_days
