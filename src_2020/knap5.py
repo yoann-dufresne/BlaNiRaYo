@@ -14,13 +14,22 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
 
+libsize_cutoff = 6
+if libsize_cutoff != 0:
+    remember_lib_ide = dict()
+    libs = [lib for lib in libs if len(lib.books) >= libsize_cutoff]
+    for i,lib in enumerate(libs):
+        remember_lib_ide[i] = lib.ide
+        lib.ide = i
+    nb_libs = len(libs)
+
 #libs = deduplicate_books(libs)
 
 L = list(range(len(libs)))
 D = list(range(nb_days)) 
 B = list(range(nb_books))
 
-NB_ORDERED_DAYS = 100
+NB_ORDERED_DAYS = 0
 UNORDERED_DAYS = list(range(nb_days-NB_ORDERED_DAYS))
 LAST_DAYS = list(range(nb_days-NB_ORDERED_DAYS,nb_days))
 
@@ -77,7 +86,7 @@ if do_mip:
     real_nb_unordered_days = m.add_var(var_type=INTEGER)
     m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L)
 
-    m += real_nb_unordered_days <= nb_days - 90 #  eyeballed time of the longest unordered library.. (can be further tuned)
+    m += real_nb_unordered_days <= nb_days  #  eyeballed time of the longest unordered library.. (can be further tuned)
     
     # make sure all l[]'s are set after the number of unordered days in ul's
     # we do this the following way:
@@ -213,6 +222,10 @@ for i in selected_libs:
         libs_sol.append(libs[i])
         avoid |= set(books_to_scan)
         libs[i].signed = True 
+
+if libsize_cutoff != 0:
+        for lib in libs_sol:
+                lib.ide = remember_lib_ide[lib.ide]
 
 print(len(avoid),"books output")
 output(sol_filename, libs_sol)

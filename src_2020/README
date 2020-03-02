@@ -15,6 +15,12 @@ best score for e:
 knap4.py
 second best: knap3.py
 
+best score for b:
+urgency.py
+and confirmed with knap3.py as each book is in a single library
+
+best score for c:
+knap2.py with f_factor = 0.5
 rest: 
 urgency.py
 

@@ -67,6 +67,7 @@ def execute(metric):
         lib_q = []
         for lib in remaining_libs:
             heapq.heappush(lib_q, (-lib.interest1(nb_days, avoid=avoid), lib))
+            #heapq.heappush(lib_q, (lib.urgency, lib)) 
     iteration = 0
     update_lib_queue()
     time_available = nb_days
