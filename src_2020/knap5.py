@@ -23,6 +23,9 @@ if libsize_cutoff != 0:
         lib.ide = i
     nb_libs = len(libs)
 
+autoselect_libsize = 9
+
+
 #libs = deduplicate_books(libs)
 
 L = list(range(len(libs)))
@@ -87,6 +90,12 @@ if do_mip:
     m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L)
 
     m += real_nb_unordered_days <= nb_days  #  eyeballed time of the longest unordered library.. (can be further tuned)
+
+    # force some libs to be used
+    if autoselect_libsize != 0:
+        for lib in libs:
+            if len(lib.books) >= autoselect_libsize:
+                m += ul[lib.ide] == 1
     
     # make sure all l[]'s are set after the number of unordered days in ul's
     # we do this the following way:
