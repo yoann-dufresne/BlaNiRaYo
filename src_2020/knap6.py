@@ -15,13 +15,47 @@ if len(sys.argv) < 2:
 prefix = sys.argv[1][sys.argv[1].index("_")-1]
 nb_books, nb_libs, nb_days, scores, libs, books = parse(sys.argv[1])
 
+# parameters for d instance only (not really optimizing the other instances at the moment)
+libsize_cutoff = 5
+autoselect_libsize = 10
+
+if libsize_cutoff != 0:
+    remember_lib_ide = dict()
+    intersections = intersect_libs(libs)
+    
+    big_libs = set([lib.ide for lib in libs if len(lib.books) >= 7])
+    books_in_big_libs = set([b for i in big_libs for b in libs[i].books])
+
+    # now keep only the small libs that don't intersect too much with the big ones
+    list_inter_with_bigs = [] 
+    def big_or_small_with_small_intersection(i):
+        global list_inter_with_bigs
+        if len(libs[i].books) >= 7: return True
+        inter_with_bigs = set(libs[i].books) & books_in_big_libs
+        list_inter_with_bigs += [len(inter_with_bigs)]
+        return len(inter_with_bigs) <= 4
+
+    #libs = [lib for lib in libs if len(lib.books) >= libsize_cutoff]
+    libs = [lib for lib in libs if big_or_small_with_small_intersection(lib.ide)]
+
+    print(Counter(list_inter_with_bigs))
+
+    for i,lib in enumerate(libs):
+        remember_lib_ide[i] = lib.ide
+        lib.ide = i
+    nb_libs = len(libs)
+
+    print("number of libs now:",nb_libs)
+    # gurobi seems to struggle with 25K libs but not with 22K libs
+
+
 #libs = deduplicate_books(libs)
 
 L = list(range(len(libs)))
 D = list(range(nb_days)) 
 B = list(range(nb_books))
 
-NB_ORDERED_DAYS = 100
+NB_ORDERED_DAYS = 0
 UNORDERED_DAYS = list(range(nb_days-NB_ORDERED_DAYS))
 LAST_DAYS = list(range(nb_days-NB_ORDERED_DAYS,nb_days))
 
@@ -78,7 +112,7 @@ if do_mip:
     real_nb_unordered_days = m.add_var(var_type=INTEGER)
     m += real_nb_unordered_days == xsum(w[i] * ul[i] for i in L)
 
-    m += real_nb_unordered_days <= nb_days - 100 #  eyeballed time of the longest unordered library.. (can be further tuned)
+    m += real_nb_unordered_days <= nb_days  #  eyeballed time of the longest unordered library.. (can be further tuned)
 
     # force some libs to be used
     if autoselect_libsize != 0:
@@ -141,7 +175,8 @@ if do_mip:
     #m.optimize(max_solutions=1,relax=True)
     #m.optimize(max_solutions=10,relax=True)
     #m.optimize(max_solutions=100,relax=True)
-    m.optimize()
+    m.optimize(max_seconds=200)
+    #m.optimize()
 
     ulibs_selected = set([i for i in L if ul[i].x >= 0.99])
     olibs_selected = set([(i,d) for i in L for d in LAST_DAYS if l[(i,d)].x >= 0.99])
@@ -219,6 +254,10 @@ for i in selected_libs:
         libs_sol.append(libs[i])
         avoid |= set(books_to_scan)
         libs[i].signed = True 
+
+if libsize_cutoff != 0:
+        for lib in libs_sol:
+                lib.ide = remember_lib_ide[lib.ide]
 
 print(len(avoid),"books output")
 output(sol_filename, libs_sol)
