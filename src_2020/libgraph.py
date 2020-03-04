@@ -11,6 +11,7 @@ import networkx as nx
 from src_2020.Parser import parse, problem_stats
 from src_2020.Parser import lib_sort_keys as sort_keys
 from src_2020.Outputer import output
+from src_2020.IntersectLibs import intersect_libs 
 
 # TODO: graph of libraries based on book content similarity
 # partition graph
@@ -39,8 +40,18 @@ def bk_dist(lib1, lib2):
 def build_libgraph(libs):
     libgraph = nx.Graph()
     libgraph.add_nodes_from(libs)
-    for (lib1, lib2) in combinations(libs, 2):
-        libgraph.add_edge(lib1, lib2, weight=bk_dist(lib1, lib2))
+    # this is the original version that requires to compute all pairs of intersections
+    # inefficient when the number of non-zero intersections is small, e.g. instance d
+    #for (lib1, lib2) in combinations(libs, 2):
+    #    libgraph.add_edge(lib1, lib2, weight=bk_dist(lib1, lib2))
+    intersections = intersect_libs(libs)
+    for i,j in intersections:
+        libgraph.add_edge(libs[i], libs[j], weight=intersections[(i,j)])
+    # if we wanted to have a complete graph:
+    #for (i,j) in combinations(list(range(len(libs))), 2):
+    #    if (i,j) not in intersections:
+    #        libgraph.add_edge(libs[i], libs[j], weight=0)
+    # TODO: a possible way to make the graph smaller, is to have nodes as indices (i) instead of lib object (libs[i])
     return libgraph
 
 

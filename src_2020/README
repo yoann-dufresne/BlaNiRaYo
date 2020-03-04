@@ -7,8 +7,8 @@ knap3.py: post-hoc version to optimize instance e, gave good results
 knap4.py: post-hoc version to optimize istances e and f, gave optimal for e
 
 best score for f:
-(soon) knap4.py
-knap2.py 
+knap5.py
+before: knap2.py 
 (with uncommented tweaks)
 
 best score for e:
@@ -24,4 +24,5 @@ knap2.py with f_factor = 0.5
 rest: 
 urgency.py
 
-
+best score for d:
+knap6.py

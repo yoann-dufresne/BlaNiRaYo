@@ -31,7 +31,7 @@ def scorer(input_file, solution_file):
             if len(lib_books) > remaining_days * libs[library_id].ship:
                 print("warning! library",library_id,"(number %d/%d in solution)" % (i//2,est_nb_libs),"with capacity",libs[library_id].ship,"outputs more books than it has time for (%d > %d)" % (len(lib_books), remaining_days * libs[library_id].ship))
 
-    print(len(all_books),"books total were selected, ",remaining_days,"unused signup day(s)")
+    print(len(all_books),"books total were selected,",remaining_days,"unused signup day(s)")
     #print(all_books)
 
     total_score = 0
